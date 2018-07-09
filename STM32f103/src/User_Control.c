@@ -1,0 +1,725 @@
+#include "User_Control.h"
+
+uint16_t Emer_flag=FALSE; //emergency case occure
+uint16_t Nbr_ID=0; //number of ID
+uint8_t OneTouch=FALSE; //one touch to open door
+uint16_t password[31]={}; //password for user
+
+
+volatile uint8_t Enter_pass_remove_alert=FALSE;//flag allow enter password to remove alert
+
+uint8_t Door_status;//door's status (open or close)
+
+uint8_t Device_status[4];
+
+static uint8_t Wrong_Nbr_ID=0;
+
+static char TempBuff[50];
+
+volatile uint16_t buff_pos=0;
+volatile uint16_t buff[100]={};
+volatile uint8_t receive_flag=FALSE;
+
+uint8_t ScanedID[5]={0x00,0x00,0x00,0x00,0x00};
+
+static volatile uint8_t AddMember_flag=FALSE;
+
+static volatile uint8_t ChangePassword_flag=FALSE;
+
+static volatile uint8_t OneTouchMode_flag=FALSE;
+
+static volatile uint8_t OpenDoorUSART_flag=FALSE;
+
+FILE __stdout;
+
+/*------------------------------printf----------------------*/
+int fputc(int ch, FILE *f) {
+    /* Do your stuff here */
+    /* Send your custom byte */
+    /* Send byte to USART */
+    User_USART2_SendChar(ch);
+    
+    /* If everything is OK, you have to return character written */
+    return ch;
+    /* If character is not correct, you can return EOF (-1) to stop writing */
+    //return -1;
+}
+
+//========================User_printf========================
+
+
+//===================convert data=================
+
+uint16_t* ConvertCharToUint16(char *s) {
+	uint8_t i;
+	static uint16_t temp[31];
+	for(i=0; i<31; i++) {
+		temp[i]=0x00;
+	}
+	for(i=0; s[i]; i++) {
+		temp[i]=s[i];
+	}
+	return temp;
+}
+
+char* ConvertUint16ToChar(uint16_t* s) {
+	uint8_t i;
+	static char temp[31];
+	for(i=0; i<31; i++) {
+		temp[i]=0x00;
+	}
+	for(i=0; s[i]; i++) {
+		temp[i]=s[i];
+	}
+	return temp;
+}
+
+char* ConvertUint8ToChar(uint8_t* s) {
+	uint8_t i;
+	static char temp[31];
+	for(i=0; i<31; i++) {
+		temp[i]=0x00;
+	}
+	for(i=0; s[i]; i++) {
+		temp[i]=s[i];
+	}
+	return temp;
+}
+
+uint8_t* ConvertCharToUint8(char *s) {
+	uint8_t i;
+	static uint8_t temp[31];
+	for(i=0; i<31; i++) {
+		temp[i]=0x00;
+	}
+	for(i=0; s[i]; i++) {
+		temp[i]=s[i];
+	}
+	return temp;
+}
+
+/*=================Read and Write page 0===============*/
+
+void Write_EmerFlag(uint16_t flag) {
+	//position 0 in page 0
+	User_FLASH_Write(flag,0,PAGE0);
+}
+void Updata_EmerFlag(void) {
+	//position 0 in page 0
+	Emer_flag=User_FLASH_Read(0,PAGE0);
+}
+
+void Write_NbrID(uint16_t Nbr) {
+	//position 1 in page 0
+	User_FLASH_Write(Nbr,1,PAGE0);
+}
+void Updata_NbrID(void) {
+	//position 1 in page 0
+	Nbr_ID=User_FLASH_Read(1,PAGE0);
+}
+
+void Write_OneTouchMode(uint16_t status) {
+	//position 2 in page 0
+	User_FLASH_Write(status,2,PAGE0);
+}
+void Updata_OneTouchMode(void) {
+	//position 2 in page 0
+	OneTouch=User_FLASH_Read(2,PAGE0);
+}
+
+void Write_Password(uint16_t* pass) {
+	//stated at position 3 in page 0
+	uint8_t i;
+	for(i=0; pass[i]; i++) {
+		User_FLASH_Write(pass[i],3+i,PAGE0);
+	}
+	for(i=i; i<31; i++) {
+		User_FLASH_Write(0x00,3+i,PAGE0);
+	}
+}
+void Updata_Password(void) {
+	//stated at position 3 in page 0
+	uint8_t i;
+	for(i=0; i<31; i++) {
+		password[i]=User_FLASH_Read(3+i,PAGE0);
+	}
+}
+
+void Write_Page0(uint16_t E_flag, uint16_t Nbr, uint16_t One_status, uint16_t* pass) {
+	User_FLASH_Erase(PAGE0);
+	
+	Write_EmerFlag(E_flag);
+	Write_NbrID(Nbr);
+	Write_OneTouchMode(One_status);
+	Write_Password(pass);
+}
+
+void Updata_Data_From_PAGE0() {
+	Updata_EmerFlag();
+	Updata_NbrID();
+	Updata_OneTouchMode();
+	Updata_Password();
+}
+
+void Display_PAGE0(void) {
+	sprintf(TempBuff,"\nEmer_flag:%d\n",Emer_flag);
+	User_USART2_SendSchar (TempBuff);
+	sprintf(TempBuff,"Nbr_ID:%d\n",Nbr_ID);
+	User_USART2_SendSchar(TempBuff);
+	sprintf(TempBuff,"One touch:%d\n",OneTouch);
+	User_USART2_SendSchar(TempBuff);
+	sprintf(TempBuff,"password:%s\n",ConvertUint16ToChar(password));
+	User_USART2_SendSchar(TempBuff);
+}
+
+/*=================Read and Write page 1===============*/
+void Add_ID (uint8_t* InID) {
+	uint8_t i, j;
+	if(Nbr_ID>=50) {
+		User_USART2_SendSchar("\nDa du so luong ID khong the add them\n");
+		return;
+	}
+	
+	//case Nbr_ID=0
+	if(Nbr_ID==0) {
+		User_FLASH_Erase(PAGE1);
+		for(i=0; i<5; i++) {
+			User_FLASH_Write(InID[i],i, PAGE1);
+		}
+		return;
+	}
+	
+	//backup data from page 1 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of ID
+	- j: index of IDi
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<5; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*5+j, PAGE1), i*5+j, PAGE4); //copy data from page 1 to page 4
+		}
+	}
+	//start write old data (from page 4) and new data to page 1
+	User_FLASH_Erase(PAGE1);
+	//old data
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<5; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*5+j, PAGE4), i*5+j, PAGE1);
+		}
+	}
+	//new data
+	for(i=0; i<5; i++) {
+		User_FLASH_Write(InID[i],Nbr_ID*5 + i, PAGE1);
+	}
+	/*-------------update nbr_id to flash (page0)---------------*/
+//	Nbr_ID++;
+//	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+int8_t Search_ID (uint8_t* InID) {
+	uint8_t i,j;
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<5; j++) {
+			if(InID[j]!=User_FLASH_Read(i*5+j,PAGE1)) {
+				break;
+			}
+		}
+		if(j==5) { // phat hien ID dung
+			return i;
+		}
+	}
+	return ID_NOT_FOUND;
+}
+
+uint8_t* Pick_ID (uint8_t index){
+	static uint8_t TempID[5];
+	uint8_t i;
+	if(index >= Nbr_ID) {
+		User_USART2_SendSchar("\nChi so khong hop le\n");
+		return NULL;
+	}
+	for(i=0; i<5; i++) {
+		TempID[i]=User_FLASH_Read(index*5+i,PAGE1);
+	}
+	return TempID;
+}
+
+void Remove_ID (uint8_t index) {
+	
+	uint8_t i, j;
+	if(index>=Nbr_ID) return;
+	
+	//in case: there's only one ID and pos need to remove is 0
+	if(Nbr_ID==1 && index==0) {
+		User_FLASH_Erase(PAGE1);
+		return;
+	}
+	
+	//backup data from page 1 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of ID
+	- j: index of IDi
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<5; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*5+j, PAGE1), i*5+j, PAGE4); //copy data from page 1 to page 4
+		}
+	}
+	
+	//start write old data from page 4 to page 1 BUT ignore ID index
+	User_FLASH_Erase(PAGE1);
+	//old data
+	for(i=0; i<Nbr_ID-1; i++) {
+		//if ID[index] found
+		if(i==index) {
+			for(i=i+1; i<Nbr_ID; i++) {
+				for(j=0; j<5; j++) {
+					User_FLASH_Write(User_FLASH_Read(i*5+j, PAGE4), (i-1)*5+j, PAGE1);
+				}
+			}
+			break;
+		}
+		//if not found
+		for(j=0; j<5; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*5+j, PAGE4), i*5+j, PAGE1);
+		}
+	}
+	
+	/*-------------update nbr_id to flash (page0)--------------*/
+//	Nbr_ID--;
+//	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+
+/*=================Read and Write page 2===============*/
+void Add_Name (uint8_t* InName) {
+	uint8_t i, j;
+	if(Nbr_ID>=50) {
+		User_USART2_SendSchar("\nDa du so luong Name khong the add them\n");
+		return;
+	}
+	//case Nbr_ID=0
+	if(Nbr_ID==0) {
+		User_FLASH_Erase(PAGE2);
+		for(i=0; i<10; i++) {
+			User_FLASH_Write(InName[i],i, PAGE2);
+		}
+		return;
+	}
+	//backup data from page 2 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of Name
+	- j: index of Namei
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<10; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*10+j, PAGE2), i*10+j, PAGE4); //copy data from page 2 to page 4
+		}
+	}
+	//start write old data (from page 4) and new data to page 2
+	User_FLASH_Erase(PAGE2);
+	//old data
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<10; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*10+j, PAGE4), i*10+j, PAGE2);
+		}
+	}
+	//new data
+	for(i=0; i<10; i++) {
+		User_FLASH_Write(InName[i],Nbr_ID*10 + i, PAGE2);
+	}
+	/*-------------update nbr_id to flash (page0)---------------*/
+//	Nbr_ID++;
+//	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+int8_t Search_Name (uint8_t* InName) {
+	uint8_t i,j;
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<10; j++) {
+			if(InName[j]!=User_FLASH_Read(i*10+j,PAGE2)) {
+				break;
+			}
+		}
+		if(j==10) { // phat hien Name dung
+			return i;
+		}
+	}
+	return -1;
+}
+
+uint8_t* Pick_Name (uint8_t index){
+	static uint8_t TempName[10];
+	uint8_t i;
+	if(index >= Nbr_ID) {
+		User_USART2_SendSchar("\nChi so khong hop le\n");
+		return NULL;
+	}
+	for(i=0; i<10; i++) {
+		TempName[i]=User_FLASH_Read(index*10+i,PAGE2);
+	}
+	return TempName;
+}
+
+void Remove_Name (uint8_t index) {
+	
+	uint8_t i, j;
+	if(index>=Nbr_ID) return;
+	//in case: there's only one ID and pos need to remove is 0
+	if(Nbr_ID==1 && index==0) {
+		User_FLASH_Erase(PAGE2);
+		return;
+	}
+	//backup data from page 2 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of Name
+	- j: index of Namei
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<10; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*10+j, PAGE2), i*10+j, PAGE4); //copy data from page 2 to page 4
+		}
+	}
+	
+	//start write old data from page 4 to page 2 BUT ignore Name index
+	User_FLASH_Erase(PAGE2);
+	//old data
+	for(i=0; i<Nbr_ID-1; i++) {
+		//if Name[index] found
+		if(i==index) {
+			for(i=i+1; i<Nbr_ID; i++) {
+				for(j=0; j<10; j++) {
+					User_FLASH_Write(User_FLASH_Read(i*10+j, PAGE4), (i-1)*10+j, PAGE2);
+				}
+			}
+			break;
+		}
+		//if not found
+		for(j=0; j<10; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*10+j, PAGE4), i*10+j, PAGE2);
+		}
+	}
+	
+	/*-------------update nbr_id to flash (page0)---------------*/
+//	Nbr_ID--;
+//	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+
+/*=================Read and Write page 3===============*/
+
+void Add_MSSV (uint32_t InMSSV) {
+	uint8_t i, j;
+	if(Nbr_ID>=50) {
+		User_USART2_SendSchar("\nDa du so luong MSSV khong the add them\n");
+		return;
+	}
+	
+	//case Nbr_ID=0
+	if(Nbr_ID==0) {
+		User_FLASH_Erase(PAGE3);
+		User_FLASH_Write((uint16_t)(InMSSV>>16),0,PAGE3); //msb first
+		User_FLASH_Write((uint16_t)(InMSSV&0x0000FFFF),1,PAGE3); //lsb after
+		return;
+	}
+	
+	//backup data from page 3 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of MSSV
+	- j: index of MSSVi
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<2; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*2+j, PAGE3), i*2+j, PAGE4); //copy data from page 3 to page 4
+		}
+	}
+	//start write old data (from page 4) and new data to page 3
+	User_FLASH_Erase(PAGE3);
+	//old data
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<2; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*2+j, PAGE4), i*2+j, PAGE3);
+		}
+	}
+	//new data
+	User_FLASH_Write((uint16_t)(InMSSV>>16),Nbr_ID*2,PAGE3); //msb first
+	User_FLASH_Write((uint16_t)(InMSSV&0x0000FFFF),Nbr_ID*2+1,PAGE3); //lsb after
+	//Updata new Nbr_ID
+}
+
+int8_t Search_MSSV (uint32_t InMSSV) {
+	uint8_t i;
+	for(i=0; i<Nbr_ID; i++) {
+		//                         MSB                                                    LSB
+		if( ((((uint32_t)User_FLASH_Read(Nbr_ID*2,PAGE3))<<16) | ((uint32_t)User_FLASH_Read(Nbr_ID*2+1,PAGE3))) == InMSSV) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+uint32_t Pick_MSSV (uint8_t index){
+	if(index >= Nbr_ID) {
+		User_USART2_SendSchar("\nChi so khong hop le\n");
+		return NULL;
+	}
+	return ((((uint32_t)User_FLASH_Read(index*2,PAGE3))<<16) | ((uint32_t)User_FLASH_Read(index*2+1,PAGE3)));
+}
+
+void Remove_MSSV (uint8_t index) {
+	
+	uint8_t i, j;
+	if(index>=Nbr_ID) return;
+	if(Nbr_ID==1 && index==0) {
+		User_FLASH_Erase(PAGE3);
+		return;
+	}
+	//backup data from page 3 to page 4 first
+	User_FLASH_Erase(PAGE4);
+	/*
+	-	i: index of number of MSSV
+	- j: index of MSSVi
+	*/
+	for(i=0; i<Nbr_ID; i++) {
+		for(j=0; j<2; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*2+j, PAGE3), i*2+j, PAGE4); //copy data from page 3 to page 4
+		}
+	}
+	
+	//start write old data from page 4 to page 3 BUT ignore MSSV index
+	User_FLASH_Erase(PAGE3);
+	//old data
+	for(i=0; i<Nbr_ID-1; i++) {
+		//if MSSV[index] found
+		if(i==index) {
+			for(i=i+1; i<Nbr_ID; i++) {
+				for(j=0; j<2; j++) {
+					User_FLASH_Write(User_FLASH_Read(i*2+j, PAGE4), (i-1)*2+j, PAGE3);
+				}
+			}
+			break;
+		}
+		//if not found
+		for(j=0; j<2; j++) {
+			User_FLASH_Write(User_FLASH_Read(i*2+j, PAGE4), i*2+j, PAGE3);
+		}
+	}
+	
+	/*-------------update nbr_id to flash (page0)---------------*/
+}
+
+void Add_NewMem(uint8_t* InID,uint8_t* InName,uint32_t InMSSV) {
+	if(Nbr_ID>=50) {
+		User_USART2_SendSchar("\nDa du so luong luong, khong the add them\n");
+		return;
+	}
+	Add_ID(InID);
+	Add_Name(InName);
+	Add_MSSV(InMSSV);
+	//update new Nbr_ID
+	Nbr_ID++;
+	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+
+void Remove_Mem(uint8_t index) {
+	if(index>=Nbr_ID) {
+		User_USART2_SendSchar("\nChi so khong hop le!\n");
+		return;
+	}
+	Remove_ID(index);
+	Remove_Name(index);
+	Remove_MSSV(index);
+	Nbr_ID--;
+	Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+}
+
+void Display_ID(uint8_t index) {
+	if(index>=Nbr_ID) {
+		User_USART2_SendSchar ("\nchi so khong hop le!\n");
+		return;
+	}
+	uint8_t* temp=NULL;
+	User_USART2_SendSchar("\nMa the:");
+	temp=Pick_ID(index);
+	sprintf(TempBuff,"%02x,%02x,%02x,%02x,%02x\n",temp[0],temp[1],temp[2],temp[3],temp[4]);
+	User_USART2_SendSchar(TempBuff);
+	sprintf(TempBuff,"Ten: %s\n",ConvertUint8ToChar(Pick_Name(index)));
+	User_USART2_SendSchar(TempBuff);
+	sprintf(TempBuff,"MSSV: %d\n",Pick_MSSV(index));
+	User_USART2_SendSchar(TempBuff);
+}
+
+void CloseDoor(void) {
+	User_TIM_Handle(SERVO_ANGLE_CLOSE);
+	Door_status=CLOSE;
+	Turn_led_close(ON);
+	Turn_led_open(OFF);
+	DelayMs(500);
+	Turn_buzz(ON);
+	DelayMs(500);
+	Turn_buzz(OFF);
+	User_USART2_SendSchar("\nClosed door\n");
+	DelayMs(1000);
+}
+void OpenDoor(void){
+	User_TIM_Handle(SERVO_ANGLE_OPEN);
+	Door_status=OPEN;
+	Turn_buzz(ON);
+	DelayMs(300);
+	Turn_buzz(OFF);
+	DelayMs(300);
+	Turn_buzz(ON);
+	DelayMs(300);
+	Turn_buzz(OFF);
+	Turn_led_close(OFF);
+	Turn_led_open(ON);
+	User_USART2_SendSchar("\nOpened door\n");
+	DelayMs(1000);
+}
+
+void Turn_led_close(uint8_t status){
+	if(status==ON) {
+		SC_bit(GPIOA,LED_Close_Pin,CLEAR);
+	}
+	else {
+		SC_bit(GPIOA,LED_Close_Pin,SET);
+	}
+}
+
+
+void Turn_led_open(uint8_t status){
+	if(status==ON) {
+		SC_bit(GPIOA,LED_Open_Pin,CLEAR);
+	}
+	else {
+		SC_bit(GPIOA,LED_Open_Pin,SET);
+	}
+}
+
+
+void Turn_buzz(uint8_t status){
+	if(status==ON) {
+		SC_bit(GPIOA,BUZZ_Pin,CLEAR);
+	}
+	else {
+		SC_bit(GPIOA,BUZZ_Pin,SET);
+	}
+}
+
+void ResetArr(uint16_t* arr, uint8_t leng) {
+	int i;
+	for(i=0;i<30; i++) {
+		arr[i]=0x0000;
+	}
+}
+
+uint8_t ComparePassword(uint16_t* InputPass) {
+	int i;
+	for (i=0; i<30; i++) {
+		if(InputPass[i]!=password[i]) {
+			return FALSE;
+		}
+	}
+	return TRUE;
+}
+
+uint8_t RequirePassword() {
+	User_USART2_SendSchar("\nVui long nhap mat khau va ket thuc bang dau '.'\n");
+	if (ComparePassword(User_USART2_ReceiveString(TempBuff,'.',30))) {
+		User_USART2_SendSchar("\nMat khau dung\n");
+		ResetArr((uint16_t*)TempBuff,50);
+		return TRUE;
+	}
+	else {
+		User_USART2_SendSchar("\nMat khau sai\n");
+		ResetArr((uint16_t*)TempBuff,50);
+		return FALSE;
+	}
+}
+
+uint8_t CheckAlert (void) {
+	if(Emer_flag||
+	Wrong_Nbr_ID>3|| //if enter wrong ID more than 3 times
+	((Door_status==CLOSE) && (SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE))) { //if door is close but sensor indicate open
+		Emer_flag=TRUE;
+		Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+	}
+	return Emer_flag;
+}
+
+void Alert(void) {
+	Run_alert:
+	while (Emer_flag && !Enter_pass_remove_alert) {
+		TM_MFRC522_Init();
+		Updata_Data_From_PAGE0();
+		User_USART2_SendSchar("\nBAO DONG!\n");
+		if (TM_MFRC522_Check(ScanedID) == MI_OK){
+			if(CheckScanedID(ScanedID)){
+				Turn_buzz(OFF);
+				Enter_pass_remove_alert=FALSE;
+				Wrong_Nbr_ID=0;
+				Emer_flag=FALSE;
+				Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+				User_USART2_SendSchar("\nDa tat bao dong!\n");
+				if(SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
+					OpenDoor();
+				}
+				return;
+			}
+		}
+		Turn_buzz(ON);
+		DelayMs(500);
+		Turn_buzz(OFF);
+		DelayMs(500);
+		if(!Read_status(GPIO_BT,BT2_Pin) && OneTouch)
+			Enter_pass_remove_alert=TRUE;
+	}
+	if(Enter_pass_remove_alert) {
+		if(RequirePassword()) {
+			Turn_buzz(OFF);
+			Enter_pass_remove_alert=FALSE;
+			Wrong_Nbr_ID=0;
+			Emer_flag=FALSE;
+			Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+			User_USART2_SendSchar("\nDa tat bao dong!\n");
+			if(SENSOR_CLOSE_DOOR>SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
+				OpenDoor();
+			}
+		}
+		else {
+			Enter_pass_remove_alert=FALSE;
+			goto Run_alert;
+		}
+	}
+}
+
+uint8_t CheckScanedID(uint8_t* IDCheck) {
+	if(Search_ID(IDCheck)==ID_NOT_FOUND)
+		return FALSE;
+	else 
+		return TRUE;
+}
+
+void DisplayMenu(void) {
+	User_USART2_SendSchar("\nm: Hien thi menu\n");
+	User_USART2_SendSchar("d: Mo cua\n");
+	User_USART2_SendSchar("a: Them thanh vien\n");
+	User_USART2_SendSchar("r: Loai bo thanh vien\n");
+	User_USART2_SendSchar("p: Doi password\n");
+	User_USART2_SendSchar("o: One touch mode\n");
+}
+
+void AddMemProcedure(void) {
+	User_USART2_SendSchar("\nAdd memeber\n");
+	if(RequirePassword()){
+		User_USART2_SendSchar("\nVui long dua the lai gan may quet\n");
+		while(TM_MFRC522_Check(ScanedID) == MI_ERR);
+		User_USART2_SendSchar("\nDa nhan duoc the\n");
+		if(CheckScanedID(ScanedID)) {//right ID
+			User_USART2_SendSchar("\nID da ton tai\n");
+			return;
+		}
+		//---------  -------...
+	}
+}
