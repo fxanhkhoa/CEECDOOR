@@ -53,9 +53,7 @@ int fputc(int ch, FILE *f) {
 uint16_t* ConvertCharToUint16(char *s) {
 	uint8_t i;
 	static uint16_t temp[31];
-	for(i=0; i<31; i++) {
-		temp[i]=0x00;
-	}
+	ResetArr(temp,31);
 	for(i=0; s[i]; i++) {
 		temp[i]=s[i];
 	}
@@ -65,9 +63,7 @@ uint16_t* ConvertCharToUint16(char *s) {
 char* ConvertUint16ToChar(uint16_t* s) {
 	uint8_t i;
 	static char temp[31];
-	for(i=0; i<31; i++) {
-		temp[i]=0x00;
-	}
+	ResetArr((uint16_t*)temp,31);
 	for(i=0; s[i]; i++) {
 		temp[i]=s[i];
 	}
@@ -77,9 +73,7 @@ char* ConvertUint16ToChar(uint16_t* s) {
 char* ConvertUint8ToChar(uint8_t* s) {
 	uint8_t i;
 	static char temp[31];
-	for(i=0; i<31; i++) {
-		temp[i]=0x00;
-	}
+	ResetArr((uint16_t*)temp,31);
 	for(i=0; s[i]; i++) {
 		temp[i]=s[i];
 	}
@@ -89,9 +83,17 @@ char* ConvertUint8ToChar(uint8_t* s) {
 uint8_t* ConvertCharToUint8(char *s) {
 	uint8_t i;
 	static uint8_t temp[31];
-	for(i=0; i<31; i++) {
-		temp[i]=0x00;
+	ResetArr((uint16_t*)temp,31);
+	for(i=0; s[i]; i++) {
+		temp[i]=s[i];
 	}
+	return temp;
+}
+
+uint8_t* ConvertUint16ToUint8(uint16_t *s) {
+	uint8_t i;
+	static uint8_t temp[31];
+	ResetArr((uint16_t*)temp,31);
 	for(i=0; s[i]; i++) {
 		temp[i]=s[i];
 	}
@@ -711,15 +713,141 @@ void DisplayMenu(void) {
 }
 
 void AddMemProcedure(void) {
+	uint8_t i;
+	uint8_t NameR[10];
+	char MSSVR[12]; //will be turned into uint32_t
+	uint16_t* ReceiveTemp;
 	User_USART2_SendSchar("\nAdd memeber\n");
 	if(RequirePassword()){
 		User_USART2_SendSchar("\nVui long dua the lai gan may quet\n");
 		while(TM_MFRC522_Check(ScanedID) == MI_ERR);
 		User_USART2_SendSchar("\nDa nhan duoc the\n");
-		if(CheckScanedID(ScanedID)) {//right ID
+		if(CheckScanedID(ScanedID)) {//ID ton tai
 			User_USART2_SendSchar("\nID da ton tai\n");
 			return;
 		}
-		//---------  -------...
+		//====================receive & assign for Name=============
+		User_USART2_SendSchar("\nNhap ten(ket thuc bang dau '.'): ");
+		ReceiveTemp=User_USART2_ReceiveString2('.',9);
+		for(i=0; i<10; i++) {
+			NameR[i]=ReceiveTemp[i];
+		}
+		//====================receive & assign for MSSV=============
+		User_USART2_SendSchar("\nNhap MSSV(ket thuc bang dau '.'): ");
+		ReceiveTemp=User_USART2_ReceiveString2('.',9);
+		for(i=0; i<10; i++) {
+			MSSVR[i]=ReceiveTemp[i];
+			if(!isalnum(MSSVR[i])) { //if is not alphanumeric
+				User_USART2_SendSchar("\nNhap MSSV sai\n");
+				return;
+			}
+		}
+		Add_NewMem(ScanedID,NameR,atoi(MSSVR));
+		User_USART2_SendSchar("\nThem thanh vien thanh cong\n");
 	}
+}
+
+uint8_t CompareUintChar(uint16_t* s1, char* s2, uint8_t leng) {
+	uint8_t i;
+	for (i=0 ; i<leng ; i++) {
+		if(s1[i]!=s2[i])
+			return FALSE;
+	}
+	return TRUE;
+}
+
+void ChangePass(void) {
+	User_USART2_SendSchar("\nChange password\nnhap lai mat khau cu: ");
+	if(RequirePassword()) { //require old pass
+		ResetArr((uint16_t*)TempBuff,31);
+		User_USART2_SendSchar("\nNhap mat khau moi (ket thuc bang dau '.'): ");
+		User_USART2_ReceiveString(TempBuff,'.',30);
+		User_USART2_SendChar('\n');
+		User_USART2_SendSchar("\nNhap lai mat khau moi (ket thuc bang dau '.'): ");
+		if(CompareUintChar(User_USART2_ReceiveString2('.',30),TempBuff,30)) {
+			User_USART2_SendSchar("\nMat khau trung khop, mat khau moi la:\n");
+			User_USART2_SendSchar(TempBuff); //display new password
+			Write_Page0(Emer_flag,Nbr_ID,OneTouch,ConvertCharToUint16(TempBuff)); //write password to flash
+			Updata_Data_From_PAGE0(); //updata new password from flash
+			return;
+		}
+		else {
+			User_USART2_SendSchar("\nMat khau xac nhan khong dung:\n");
+			return;
+		}
+	}
+	else {
+		User_USART2_SendSchar("Sai mat khau, truy cap bi tu choi\n");
+		return;
+	}
+}
+
+void TurnOneTouchMode(void) {
+	User_USART2_SendSchar("\nTurn one touch mode:\n");
+	if(RequirePassword()) {
+		User_USART2_SendSchar("\nON: de bat\nOFF: de tat\n");
+		ResetArr((uint16_t*)TempBuff,31);
+		User_USART2_ReceiveString(TempBuff,'.',4);
+		if(strcmp(TempBuff,"ON")==0) {
+			OneTouch=ON;
+			Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+			User_USART2_SendSchar("\nTurn ON\n");
+			return;
+		}
+		else if(strcmp(TempBuff,"OFF")==0) {
+			OneTouch=OFF;
+			Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
+			User_USART2_SendSchar("\nTurn OFF\n");
+			return;
+		}
+		else {
+			User_USART2_SendSchar("\nNhap khong dung\n");
+			return;
+		}
+	}
+	else {
+		User_USART2_SendSchar("\nSai mat khau\n");
+	}
+}
+
+//for interrupt receive usart2==============
+void USART2_IRQHandler(void){
+	//get data when ever receive interrupt excuse and receive_flag for receive string
+	if((USART_GetITStatus(User_USART2, USART_IT_RXNE) != RESET) && receive_flag) {
+		buff[buff_pos++]=User_USART2_ReceiveChar();
+	}
+	
+	if(USART_GetITStatus(User_USART2, USART_IT_RXNE) != RESET && !Emer_flag && !Enter_pass_remove_alert && !receive_flag) {
+		switch(User_USART2_ReceiveChar()) {
+			case 'm': //display option menu
+				DisplayMenu();
+				break;
+			
+			case 'a': //add new member
+				AddMember_flag=TRUE;
+				break;
+			
+			case 'r': //remove mem
+				RemoveMember_flag=TRUE;
+			
+			case 'p': //change new pass word
+				ChangePassword_flag=TRUE;
+				break;
+			
+			case 'o': //change one touch mode
+				OneTouchMode_flag=TRUE;
+				break;
+			case 'd': //opendoor from usart
+				OpenDoorUSART_flag=TRUE;
+				break;
+			
+		}
+	}
+	//if alert occure, want to shutdown it
+	if(USART_GetITStatus(User_USART2, USART_IT_RXNE) != RESET && Emer_flag && !Enter_pass_remove_alert && !receive_flag) {
+		if(User_USART2_ReceiveChar()=='x') {
+			Enter_pass_remove_alert=TRUE;
+		}
+	}
+	
 }

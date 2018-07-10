@@ -21,6 +21,8 @@ Button 2 : tat bao dong
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 /*==================================*/
 #define ID_NOT_FOUND -1
@@ -73,6 +75,8 @@ extern uint8_t ScanedID[5];
 
 static volatile uint8_t AddMember_flag;
 
+static volatile uint8_t RemoveMember_flag;
+
 static volatile uint8_t ChangePassword_flag;
 
 static volatile uint8_t OneTouchMode_flag;
@@ -105,6 +109,7 @@ uint16_t* ConvertCharToUint16(char *s);
 char* ConvertUint16ToChar(uint16_t* s);
 char* ConvertUint8ToChar(uint8_t* s);
 uint8_t* ConvertCharToUint8(char *s);
+uint8_t* ConvertUint16ToUint8(uint16_t *s);
 
 //===================PAGE 0==================
 /*
@@ -258,7 +263,7 @@ void DisplayMenu(void);
 /*
 compare 2 string uint16_t* vs char*
 */
-uint8_t CompareUintChar(uint16_t* s1, char* s2);
+uint8_t CompareUintChar(uint16_t* s1, char* s2, uint8_t leng);
 
 /*
 Change password current
@@ -269,6 +274,11 @@ void ChangePass(void);
 turn on or off One touch mode
 */
 void TurnOneTouchMode(void);
+
+/*
+Receive interrupt usart2
+*/
+void USART2_IRQHandler(void);
 
 #endif /*__USER_CONTROL_H */
 /*******END OF FILE****/
