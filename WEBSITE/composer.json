@@ -1,59 +1,43 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
-    "license": "MIT",
+    "name": "zendframework/skeleton-application",
+    "description": "Skeleton Application for Zend Framework zend-mvc applications",
     "type": "project",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "framework",
+        "mvc",
+        "zf"
+    ],
+    "homepage": "http://framework.zend.com/",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
-        "php": "^7.1.3",
-        "fideloper/proxy": "^4.0",
-        "laravel/framework": "5.6.*",
-        "laravel/tinker": "^1.0"
-    },
-    "require-dev": {
-        "filp/whoops": "^2.0",
-        "fzaninotto/faker": "^1.4",
-        "mockery/mockery": "^1.0",
-        "nunomaduro/collision": "^2.0",
-        "phpunit/phpunit": "^7.0"
+        "php": "^5.6 || ^7.0",
+        "zendframework/zend-component-installer": "^1.0 || ^0.7 || ^1.0.0-dev@dev",
+        "zendframework/zend-mvc": "^3.0.1",
+        "zfcampus/zf-development-mode": "^3.0"
     },
     "autoload": {
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ],
         "psr-4": {
-            "App\\": "app/"
+            "Application\\": "module/Application/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests/"
+            "ApplicationTest\\": "module/Application/test/"
         }
     },
-    "extra": {
-        "laravel": {
-            "dont-discover": [
-            ]
-        }
-    },
+    "extra": [],
     "scripts": {
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "development-disable": "zf-development-mode disable",
+        "development-enable": "zf-development-mode enable",
+        "development-status": "zf-development-mode status",
         "post-create-project-cmd": [
-            "@php artisan key:generate"
+            "@development-enable"
         ],
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover"
-        ]
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+        "serve": "php -S 0.0.0.0:8080 -t public public/index.php",
+        "test": "phpunit"
+    }
 }
