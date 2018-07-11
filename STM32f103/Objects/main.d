@@ -26,3 +26,5 @@
 .\objects\main.o: .\inc\User_GPIO.h
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\string.h
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdarg.h
+.\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\ctype.h

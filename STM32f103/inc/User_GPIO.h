@@ -7,12 +7,7 @@ button 2: GPIOC (15)
 LED open door: GPIOA (4)
 LED close door: GPIOA (5)
 
-Buzz: GPIOA (7)
-
-device 1: GPIOB (5)
-device 2: GPIOB (4)
-device 3: GPIOB (3)
-device 4: GPIOA (15)
+Buzz: GPIOA (6)
 
 */
 
@@ -35,14 +30,8 @@ device 4: GPIOA (15)
 
 #define LED_Open_Pin GPIO_Pin_4
 #define LED_Close_Pin GPIO_Pin_5
-//#define GPIO_Pin_6 (GPIOA) reverve
 
-#define BUZZ_Pin GPIO_Pin_7
-
-#define DV1_Pin GPIO_Pin_5
-#define DV2_Pin GPIO_Pin_4
-#define DV3_Pin GPIO_Pin_3
-#define DV4_Pin GPIO_Pin_15
+#define BUZZ_Pin GPIO_Pin_6
 
 static GPIO_InitTypeDef GPIO_InitStructure;
 

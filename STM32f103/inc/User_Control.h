@@ -28,13 +28,13 @@ Button 2 : tat bao dong
 #define ID_NOT_FOUND -1
 
 //angle for servo close or open door
-#define SERVO_ANGLE_CLOSE 20
-#define SERVO_ANGLE_OPEN	-75
+#define SERVO_ANGLE_CLOSE 90
+#define SERVO_ANGLE_OPEN	-90
 
 //adc's value for able close door (<=value)->close door
 #define SENSOR_CLOSE_DOOR ADCConvertedValue
-#define SENSOR_CLOSE_DOOR_VALUE 80
-#define SENSOR_OPEN_DOOR_VALUE 900
+#define SENSOR_CLOSE_DOOR_VALUE 250
+#define SENSOR_OPEN_DOOR_VALUE 3000
 
 //status of door (open or close)
 #define CLOSE 0
@@ -63,25 +63,25 @@ extern volatile uint8_t Enter_pass_remove_alert;//flag allow enter password to r
 
 extern uint8_t Door_status;//door's status (open or close)
 
-static uint8_t Wrong_Nbr_ID;
+extern uint8_t Wrong_Nbr_ID;
 
-static char TempBuff[50];
+extern char TempBuff[50];
 
-static volatile uint16_t buff_pos;
-static volatile uint16_t buff[100];
-static volatile uint8_t receive_flag;
+extern volatile uint16_t buff_pos;
+extern volatile uint16_t buff[100];
+extern volatile uint8_t receive_flag;
 
 extern uint8_t ScanedID[5];
 
-static volatile uint8_t AddMember_flag;
+extern volatile uint8_t AddMember_flag;
 
-static volatile uint8_t RemoveMember_flag;
+extern volatile uint8_t RemoveMember_flag;
 
-static volatile uint8_t ChangePassword_flag;
+extern volatile uint8_t ChangePassword_flag;
 
-static volatile uint8_t OneTouchMode_flag;
+extern volatile uint8_t OneTouchMode_flag;
 
-static volatile uint8_t OpenDoorUSART_flag;
+extern volatile uint8_t OpenDoorUSART_flag;
 
 //======================printf()====================
 
@@ -131,7 +131,7 @@ void Write_Page0(uint16_t E_flag, uint16_t Nbr, uint16_t One_status, uint16_t* p
 
 void Updata_Data_From_PAGE0(void);
 
-void Display_PAGE0(void);
+extern void Display_PAGE0(void);
 
 //=======================PAGE 1====================
 // SIZE: 2bytes/ID[index]; 10bytes/ID <=> 5pos/ID
@@ -195,8 +195,9 @@ uint32_t Pick_MSSV (uint8_t index);
 void Remove_MSSV (uint8_t index);
 
 /*-----------------For all function above--------------*/
-void AddMemProcedure(void);
+void Add_Mem_Procedure(void);
 void Add_NewMem(uint8_t* InID,uint8_t* InName,uint32_t InMSSV);
+void Remove_Mem_Procedure(void);
 void Remove_Mem(uint8_t index);
 void Display_ID(uint8_t index);
 

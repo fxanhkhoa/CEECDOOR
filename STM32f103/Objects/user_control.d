@@ -25,3 +25,5 @@
 .\objects\user_control.o: .\inc\User_GPIO.h
 .\objects\user_control.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\string.h
 .\objects\user_control.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdarg.h
+.\objects\user_control.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\user_control.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\ctype.h

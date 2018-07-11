@@ -3,18 +3,14 @@
 uint16_t Emer_flag=FALSE; //emergency case occure
 uint16_t Nbr_ID=0; //number of ID
 uint8_t OneTouch=FALSE; //one touch to open door
-uint16_t password[31]={}; //password for user
-
+uint16_t password[31]={};
 
 volatile uint8_t Enter_pass_remove_alert=FALSE;//flag allow enter password to remove alert
 
-uint8_t Door_status;//door's status (open or close)
+uint8_t Door_status=OPEN;//door's status (open or close)
+uint8_t Wrong_Nbr_ID=0;
 
-uint8_t Device_status[4];
-
-static uint8_t Wrong_Nbr_ID=0;
-
-static char TempBuff[50];
+char TempBuff[50];
 
 volatile uint16_t buff_pos=0;
 volatile uint16_t buff[100]={};
@@ -22,13 +18,15 @@ volatile uint8_t receive_flag=FALSE;
 
 uint8_t ScanedID[5]={0x00,0x00,0x00,0x00,0x00};
 
-static volatile uint8_t AddMember_flag=FALSE;
+volatile uint8_t AddMember_flag=FALSE;
 
-static volatile uint8_t ChangePassword_flag=FALSE;
+volatile uint8_t RemoveMember_flag=FALSE;
 
-static volatile uint8_t OneTouchMode_flag=FALSE;
+volatile uint8_t ChangePassword_flag=FALSE;
 
-static volatile uint8_t OpenDoorUSART_flag=FALSE;
+volatile uint8_t OneTouchMode_flag=FALSE;
+
+volatile uint8_t OpenDoorUSART_flag=FALSE;
 
 FILE __stdout;
 
@@ -541,10 +539,12 @@ void Display_ID(uint8_t index) {
 		User_USART2_SendSchar ("\nchi so khong hop le!\n");
 		return;
 	}
+	sprintf(TempBuff,"[%d].",index);
+	User_USART2_SendSchar(TempBuff);
 	uint8_t* temp=NULL;
 	User_USART2_SendSchar("\nMa the:");
 	temp=Pick_ID(index);
-	sprintf(TempBuff,"%02x,%02x,%02x,%02x,%02x\n",temp[0],temp[1],temp[2],temp[3],temp[4]);
+	sprintf(TempBuff,"[%02X,%02X,%02X,%02X,%02X]\n",temp[0],temp[1],temp[2],temp[3],temp[4]);
 	User_USART2_SendSchar(TempBuff);
 	sprintf(TempBuff,"Ten: %s\n",ConvertUint8ToChar(Pick_Name(index)));
 	User_USART2_SendSchar(TempBuff);
@@ -618,7 +618,7 @@ void ResetArr(uint16_t* arr, uint8_t leng) {
 
 uint8_t ComparePassword(uint16_t* InputPass) {
 	int i;
-	for (i=0; i<30; i++) {
+	for (i=0; i<31; i++) {
 		if(InputPass[i]!=password[i]) {
 			return FALSE;
 		}
@@ -685,7 +685,7 @@ void Alert(void) {
 			Emer_flag=FALSE;
 			Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
 			User_USART2_SendSchar("\nDa tat bao dong!\n");
-			if(SENSOR_CLOSE_DOOR>SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
+			if(SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
 				OpenDoor();
 			}
 		}
@@ -712,11 +712,11 @@ void DisplayMenu(void) {
 	User_USART2_SendSchar("o: One touch mode\n");
 }
 
-void AddMemProcedure(void) {
+void Add_Mem_Procedure(void) {
 	uint8_t i;
 	uint8_t NameR[10];
 	char MSSVR[12]; //will be turned into uint32_t
-	uint16_t* ReceiveTemp;
+	uint16_t* ReceiveTemp=NULL;
 	User_USART2_SendSchar("\nAdd memeber\n");
 	if(RequirePassword()){
 		User_USART2_SendSchar("\nVui long dua the lai gan may quet\n");
@@ -734,16 +734,33 @@ void AddMemProcedure(void) {
 		}
 		//====================receive & assign for MSSV=============
 		User_USART2_SendSchar("\nNhap MSSV(ket thuc bang dau '.'): ");
-		ReceiveTemp=User_USART2_ReceiveString2('.',9);
+		ReceiveTemp=User_USART2_ReceiveString2('.',10);
 		for(i=0; i<10; i++) {
 			MSSVR[i]=ReceiveTemp[i];
-			if(!isalnum(MSSVR[i])) { //if is not alphanumeric
-				User_USART2_SendSchar("\nNhap MSSV sai\n");
-				return;
-			}
 		}
 		Add_NewMem(ScanedID,NameR,atoi(MSSVR));
 		User_USART2_SendSchar("\nThem thanh vien thanh cong\n");
+	}
+}
+
+void Remove_Mem_Procedure(void) {
+	if(Nbr_ID<=0) {
+		User_USART2_SendSchar("\nSo luong thanh vien hien la 0\n");
+		return;
+	}
+	uint8_t i;
+	uint16_t* ReceiveTemp;
+	User_USART2_SendSchar("\nRemove memeber\n");
+	if(RequirePassword()){
+		for(i=0; i<Nbr_ID; i++) {
+			Display_ID(i);
+		}
+		User_USART2_SendSchar("\nChon thanh vien can loai bo (ket thuc bang dau '.'): ");
+		do {
+			User_USART2_ReceiveString(TempBuff,'.',10);
+		} while(atoi(TempBuff)<0 || atoi(TempBuff)>=Nbr_ID);
+		Remove_Mem(atoi(TempBuff));
+		User_USART2_SendSchar("\nDa loai bo thanh vien\n");
 	}
 }
 
@@ -829,6 +846,7 @@ void USART2_IRQHandler(void){
 			
 			case 'r': //remove mem
 				RemoveMember_flag=TRUE;
+				break;
 			
 			case 'p': //change new pass word
 				ChangePassword_flag=TRUE;
