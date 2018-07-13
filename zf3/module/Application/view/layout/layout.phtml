@@ -6,7 +6,13 @@
     <meta charset="utf-8">
     <!-- <meta name="viewport" content="width=device-width, maximum-scale=1"> -->
 
-    <?= $this->headTitle('Homepage')->setSeparator(' - ')->setAutoEscape(false) ?>
+    <!-- Check headTitle -->
+    <?php
+      if ($this->url() == $this->url('home'))
+      {
+        echo $this->headTitle('Homepage')->setSeparator(' - ')->setAutoEscape(false);
+      }
+    ?>
      <?= $this->headMeta()
         ->appendName('viewport', 'width = device-width, maximum-scale=1')
         ->appendHttpEquiv('X-UA-Compatible', 'IE = edge')
@@ -71,9 +77,9 @@
         <figure class="logo animated fadeInDown delay-07s">
           <a href="#"><img src="<?php echo $this->basePath('img/logo.png'); ?>" alt=""></a>
         </figure>
-        <h1 class="animated fadeInDown delay-07s">Welcome To Knight Studios</h1>
+        <h1 class="animated fadeInDown delay-07s">Welcome To CEEC</h1>
         <ul class="we-create animated fadeInUp delay-1s">
-          <li>We are a digital agency that loves crafting beautiful websites.</li>
+          <li>Computer Engineering Embedded Club</li>
         </ul>
         <a class="link animated fadeInUp delay-1s servicelink" href="#service">Get Started</a>
       </div>
@@ -106,7 +112,7 @@
         <hr>
         <footer class="footer">
           <div class="container">
-            <div class="footer-logo"><a href="<?= $this->url('application', ['action' => 'about']) ?>"><img src="<?php echo $this->basePath('img/footer-logo.png'); ?>" alt=""></a></div>
+            <div class="footer-logo"><a href="<?= $this->url('about') ?>"><img src="<?php echo $this->basePath('img/footer-logo.png'); ?>" alt=""></a></div>
             <span class="copyright">&copy; Knight Theme. All Rights Reserved</span>
             <div class="credits">
               <!--
@@ -116,8 +122,9 @@
           Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=Knight
         -->
               Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-              <p>&copy; 2005 -
-                <?= date('Y') ?> by Zend Technologies Ltd. All rights reserved.</p>
+              Editted by <a href ="https://www.facebook.com/Computer.Engineering.Embedded.Club">CEEC</a>
+              <p>&copy; 2010 -
+                <?= date('Y') ?> by Computer Engineering Embedded Club @ All rights reserved.</p>
             </div>
           </div>
         </footer>

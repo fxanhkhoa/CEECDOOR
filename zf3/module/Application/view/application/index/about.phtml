@@ -1,2 +1,14 @@
 <?= $this->headTitle('AboutPage')->setSeparator(' - ')->setAutoEscape(false) ?>
-<h2>About page</h2>
+<h1>About</h1>
+
+<p>
+    The Hello World application.
+</p>
+
+<p>
+    Application name: <?= $this->escapeHtml($appName); ?>
+</p>
+
+<p>
+    Application description: <?= $this->escapeHtml($appDescription); ?>.
+</p>

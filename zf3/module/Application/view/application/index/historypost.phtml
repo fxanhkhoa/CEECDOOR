@@ -1,0 +1,40 @@
+<?= $this->headTitle('HistoryPage')->setSeparator(' - ')->setAutoEscape(false) ?>
+<h1 align="center">USAGE HISTORY</h1>
+
+<table class="table table-striped table-hover">
+<?php
+
+
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\View\Model\ViewModel;
+use Zend\DB\Adapter\Adapter;
+
+    $adapter = new \Zend\Db\Adapter\Adapter(array(
+        'driver' => 'Pdo_Mysql',
+        'database' => 'framework',
+        'username' => 'fxanhkhoa',
+        'password' => '03021996',
+        'hostname' => 'localhost',
+        'charset' => 'utf8'
+    ));
+
+    $sql = "select * from USERUSAGE";
+
+    $statement = $adapter->query($sql);
+
+    $result = $statement->execute();
+    $platform = $adapter->platform;
+?>
+
+  <tr>
+    <th>MSSV</th>
+    <th>MA RFID</th>
+    <th>TIME USE DOOR</th>
+  </tr>
+<?php
+    foreach ($result as $row)
+      {
+        echo $this->partial('application/index/table-row', ['row'=>$row]);
+      }
+?>
+</table>

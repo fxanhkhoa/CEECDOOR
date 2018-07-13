@@ -10,6 +10,8 @@ namespace Application;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\Router\Http\Regex;
+use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
 
 return [
     'router' => [
@@ -34,11 +36,57 @@ return [
                     ],
                 ],
             ],
+            'getJson' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/getJson',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'getJson',
+                    ],
+                ],
+            ],
+            'about' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/about',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'about',
+                    ],
+                ],
+            ],
+            'barcode' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route' => '/barcode[/:type/:label]',
+                    'constraints' => [
+                        'type' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'label' => '[a-zA-Z0-9_-]*'
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action' => 'barcode',
+                    ],
+                ],
+            ],
+            'doc' => [
+                'type' => Regex::class,
+                'options' => [
+                    'regex'    => '/doc(?<page>\/[a-zA-Z0-9_\-]+)\.html',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'doc',
+                    ],
+                    'spec'=>'/doc/%page%.html'
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => InvokableFactory::class,
+            Controller\DownloadController::class => InvokableFactory::class
         ],
     ],
     'view_manager' => [
@@ -55,6 +103,22 @@ return [
         ],
         'template_path_stack' => [
             __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
+        ],
+    ],
+    'doctrine' => [
+        'connection' => [
+            'orm_default' => [
+                'driverClass' => PDOMySqlDriver::class,
+                'params' => [
+                    'host'     => '127.0.0.1',
+                    'user'     => 'fxanhkhoa',
+                    'password' => '03021996',
+                    'dbname'   => 'id6432065_door',
+                ]
+            ],
         ],
     ],
 ];
