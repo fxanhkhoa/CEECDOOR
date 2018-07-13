@@ -477,11 +477,6 @@
               <FilePath>.\src\tm_stm32f10x_mfrc522.c</FilePath>
             </File>
             <File>
-              <FileName>User_ADC_DMA.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\src\User_ADC_DMA.c</FilePath>
-            </File>
-            <File>
               <FileName>User_FLASH.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\User_FLASH.c</FilePath>
@@ -500,6 +495,11 @@
               <FileName>User_USART2.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\src\User_USART2.c</FilePath>
+            </File>
+            <File>
+              <FileName>User_USART3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\User_USART3.c</FilePath>
             </File>
           </Files>
         </Group>

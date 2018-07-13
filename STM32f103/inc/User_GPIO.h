@@ -9,6 +9,8 @@ LED close door: GPIOA (5)
 
 Buzz: GPIOA (6)
 
+switch: GPIOA (1) // cong tac hanh trinh
+
 */
 
 #ifndef __USER_GPIO_H
@@ -32,6 +34,8 @@ Buzz: GPIOA (6)
 #define LED_Close_Pin GPIO_Pin_5
 
 #define BUZZ_Pin GPIO_Pin_6
+
+#define SWITCH_Pin GPIO_Pin_1
 
 static GPIO_InitTypeDef GPIO_InitStructure;
 

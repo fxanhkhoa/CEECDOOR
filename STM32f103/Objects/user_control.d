@@ -12,12 +12,10 @@
 .\objects\user_control.o: .\inc\stm32f10x_usart.h
 .\objects\user_control.o: .\inc\misc.h
 .\objects\user_control.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\user_control.o: .\inc\User_USART3.h
 .\objects\user_control.o: .\inc\delay.h
 .\objects\user_control.o: .\inc\User_TIM.h
 .\objects\user_control.o: .\inc\stm32f10x_tim.h
-.\objects\user_control.o: .\inc\User_ADC_DMA.h
-.\objects\user_control.o: .\inc\stm32f10x_adc.h
-.\objects\user_control.o: .\inc\stm32f10x_dma.h
 .\objects\user_control.o: .\inc\tm_stm32f10x_mfrc522.h
 .\objects\user_control.o: .\inc\stm32f10x_spi.h
 .\objects\user_control.o: .\inc\User_FLASH.h

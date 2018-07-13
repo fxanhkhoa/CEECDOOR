@@ -11,10 +11,10 @@ Button 2 : tat bao dong
 #define __USER_CONTROL_H
 
 #include "User_USART2.h"
+#include "User_USART3.h"
 #include "stm32f10x.h"
 #include "delay.h"
 #include "User_TIM.h"
-#include "User_ADC_DMA.h"
 #include "tm_stm32f10x_mfrc522.h"
 #include "User_FLASH.h"
 #include "User_GPIO.h"
@@ -30,11 +30,6 @@ Button 2 : tat bao dong
 //angle for servo close or open door
 #define SERVO_ANGLE_CLOSE 90
 #define SERVO_ANGLE_OPEN	-90
-
-//adc's value for able close door (<=value)->close door
-#define SENSOR_CLOSE_DOOR ADCConvertedValue
-#define SENSOR_CLOSE_DOOR_VALUE 250
-#define SENSOR_OPEN_DOOR_VALUE 3000
 
 //status of door (open or close)
 #define CLOSE 0
@@ -228,6 +223,11 @@ return TRUE if alert occure
 			FALSE for opposite
 */
 uint8_t CheckAlert (void);
+
+/*
+check door's status base on switch
+*/
+uint8_t CheckDoorStatus(void);
 
 /*
 Alert

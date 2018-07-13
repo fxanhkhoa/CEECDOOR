@@ -7,7 +7,7 @@ uint16_t password[31]={};
 
 volatile uint8_t Enter_pass_remove_alert=FALSE;//flag allow enter password to remove alert
 
-uint8_t Door_status=OPEN;//door's status (open or close)
+uint8_t Door_status=OPEN;//preveous door's status (open or close)
 uint8_t Wrong_Nbr_ID=0;
 
 char TempBuff[50];
@@ -35,7 +35,7 @@ int fputc(int ch, FILE *f) {
     /* Do your stuff here */
     /* Send your custom byte */
     /* Send byte to USART */
-    User_USART2_SendChar(ch);
+    User_USART3_SendChar(ch);
     
     /* If everything is OK, you have to return character written */
     return ch;
@@ -643,11 +643,19 @@ uint8_t RequirePassword() {
 uint8_t CheckAlert (void) {
 	if(Emer_flag||
 	Wrong_Nbr_ID>3|| //if enter wrong ID more than 3 times
-	((Door_status==CLOSE) && (SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE))) { //if door is close but sensor indicate open
+	((Door_status==CLOSE) && (CheckDoorStatus()==OPEN))) { //if door is close but switch indicate open
 		Emer_flag=TRUE;
 		Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
 	}
 	return Emer_flag;
+}
+
+uint8_t CheckDoorStatus(void) {
+	if(!Read_status(GPIOA,SWITCH_Pin)) {
+		return CLOSE;
+	}
+	else
+		return OPEN;
 }
 
 void Alert(void) {
@@ -664,7 +672,7 @@ void Alert(void) {
 				Emer_flag=FALSE;
 				Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
 				User_USART2_SendSchar("\nDa tat bao dong!\n");
-				if(SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
+				if(CheckDoorStatus()==OPEN && Door_status==CLOSE) {
 					OpenDoor();
 				}
 				return;
@@ -685,7 +693,7 @@ void Alert(void) {
 			Emer_flag=FALSE;
 			Write_Page0(Emer_flag,Nbr_ID,OneTouch,password);
 			User_USART2_SendSchar("\nDa tat bao dong!\n");
-			if(SENSOR_CLOSE_DOOR>=SENSOR_OPEN_DOOR_VALUE && Door_status==CLOSE) {
+			if(CheckDoorStatus()==OPEN && Door_status==CLOSE) {
 				OpenDoor();
 			}
 		}
@@ -749,7 +757,6 @@ void Remove_Mem_Procedure(void) {
 		return;
 	}
 	uint8_t i;
-	uint16_t* ReceiveTemp;
 	User_USART2_SendSchar("\nRemove memeber\n");
 	if(RequirePassword()){
 		for(i=0; i<Nbr_ID; i++) {

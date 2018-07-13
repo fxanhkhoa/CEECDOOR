@@ -2,18 +2,16 @@
 
 
 
-
 int main (void) {
-	uint8_t i;
 	DelayInit();
 	DelayUs(10);
 	TM_MFRC522_Init();
 	DelayUs(10);
 	User_TIM_Init();
 	DelayUs(10);
-	User_USART2_Init(115200);
+	User_USART2_Init(9600);
+	User_USART3_Init(115200);
 	DelayUs(10);
-	User_ADC_DMA_Init();
 	DelayUs(10);
 	User_GPIO_Init();
 	DelayUs(10);
@@ -21,13 +19,7 @@ int main (void) {
 	Turn_buzz(OFF);
 	Turn_led_close(OFF);
 	Turn_led_open(OFF);
-	
-	while(1)
-	{
-		OpenDoor();
-		CloseDoor();
-	}
-	if(SENSOR_CLOSE_DOOR<=SENSOR_CLOSE_DOOR_VALUE) {
+	if(CheckDoorStatus()==CLOSE) {
 		CloseDoor();
 	}
 	else {
@@ -98,10 +90,10 @@ int main (void) {
 			OpenDoorUSART_flag=FALSE;
 		}
 		//------------------------close door automatically-----------------------
-		if(SENSOR_CLOSE_DOOR<=SENSOR_CLOSE_DOOR_VALUE && Door_status!=CLOSE) {//able close door
-			//delay 2s in case someone open again
-			DelayMs(2000);
-			if(SENSOR_CLOSE_DOOR<=SENSOR_CLOSE_DOOR_VALUE){
+		if(CheckDoorStatus()==CLOSE && Door_status!=CLOSE) {//able close door
+			//delay 500ms in case someone open again
+			DelayMs(500);
+			if(CheckDoorStatus()==CLOSE){
 				CloseDoor();
 			}
 		}

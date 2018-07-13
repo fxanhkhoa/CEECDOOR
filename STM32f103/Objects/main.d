@@ -13,12 +13,10 @@
 .\objects\main.o: .\inc\stm32f10x_usart.h
 .\objects\main.o: .\inc\misc.h
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: .\inc\User_USART3.h
 .\objects\main.o: .\inc\delay.h
 .\objects\main.o: .\inc\User_TIM.h
 .\objects\main.o: .\inc\stm32f10x_tim.h
-.\objects\main.o: .\inc\User_ADC_DMA.h
-.\objects\main.o: .\inc\stm32f10x_adc.h
-.\objects\main.o: .\inc\stm32f10x_dma.h
 .\objects\main.o: .\inc\tm_stm32f10x_mfrc522.h
 .\objects\main.o: .\inc\stm32f10x_spi.h
 .\objects\main.o: .\inc\User_FLASH.h
