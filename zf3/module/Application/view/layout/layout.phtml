@@ -7,12 +7,7 @@
     <!-- <meta name="viewport" content="width=device-width, maximum-scale=1"> -->
 
     <!-- Check headTitle -->
-    <?php
-      if ($this->url() == $this->url('home'))
-      {
-        echo $this->headTitle('Homepage')->setSeparator(' - ')->setAutoEscape(false);
-      }
-    ?>
+    <?= $this->headTitle('CEEC')->setSeparator(' - ')->setAutoEscape(false); ?>
      <?= $this->headMeta()
         ->appendName('viewport', 'width = device-width, maximum-scale=1')
         ->appendHttpEquiv('X-UA-Compatible', 'IE = edge')

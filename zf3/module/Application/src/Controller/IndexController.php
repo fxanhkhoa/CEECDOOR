@@ -36,6 +36,7 @@ class IndexController extends AbstractActionController
           'appName' => $appName,
           'appDescription' => $appDescription
         ]);
+
     }
 
     public function checkAction()
@@ -134,5 +135,15 @@ class IndexController extends AbstractActionController
   ];
 
         return new ViewModel(['products' => $products]);
+    }
+
+    public function loginAction()
+    {
+        $checkMethod = $this->getRequest();
+        if ($checkMethod ->isGet())
+        {
+          echo "using GET";
+        }
+        return false;
     }
 }
