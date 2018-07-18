@@ -2,51 +2,46 @@
 <section class="main-section" id="service">
   <!--main-section-start-->
   <div class="container">
-    <h2>RFID CHECK HISTORY</h2>
-    <h6>List all people who use RFID in this door</h6>
+    <h2>Services</h2>
+    <h6>We offer exceptional service with complimentary hugs.</h6>
     <div class="row">
-      <div class="table-wrapper-scroll-y col-lg-4 col-sm-6 wow fadeInLeft delay-05s">
-        <table class="table table-striped table-hover ">
-        <?php
-
-
-        use Zend\Mvc\Controller\AbstractActionController;
-        use Zend\View\Model\ViewModel;
-        use Zend\DB\Adapter\Adapter;
-
-            $adapter = new \Zend\Db\Adapter\Adapter(array(
-                'driver' => 'Pdo_Mysql',
-                'database' => 'framework',
-                'username' => 'fxanhkhoa',
-                'password' => '03021996',
-                'hostname' => 'localhost',
-                'charset' => 'utf8'
-            ));
-
-            $sql = "select * from USERUSAGE";
-
-            $statement = $adapter->query($sql);
-
-            $result = $statement->execute();
-            $platform = $adapter->platform;
-        ?>
-
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">MSSV</th>
-            <th scope="col">MA RFID</th>
-            <th scope="col">TIME USE DOOR</th>
-            <th scope="col">GHI CHU</th>
-          </tr>
-        </thead>
-        <?php
-            foreach ($result as $row)
-              {
-                echo $this->partial('application/index/table-row', ['row'=>$row]);
-              }
-        ?>
-        </table>
+      <div class="col-lg-4 col-sm-6 wow fadeInLeft delay-05s">
+        <div class="service-list">
+          <div class="service-list-col1">
+            <i class="fa fa-paw"></i>
+          </div>
+          <div class="service-list-col2">
+            <h3>branding &amp; identity</h3>
+            <p>Proin iaculis purus digni consequat sem digni ssim. Donec entum digni ssim.</p>
+          </div>
+        </div>
+        <div class="service-list">
+          <div class="service-list-col1">
+            <i class="fa fa-gear"></i>
+          </div>
+          <div class="service-list-col2">
+            <h3>web development</h3>
+            <p>Proin iaculis purus consequat sem digni ssim. Digni ssim porttitora .</p>
+          </div>
+        </div>
+        <div class="service-list">
+          <div class="service-list-col1">
+            <i class="fa fa-apple"></i>
+          </div>
+          <div class="service-list-col2">
+            <h3>mobile design</h3>
+            <p>Proin iaculis purus consequat digni sem digni ssim. Purus donec porttitora entum.</p>
+          </div>
+        </div>
+        <div class="service-list">
+          <div class="service-list-col1">
+            <i class="fa fa-medkit"></i>
+          </div>
+          <div class="service-list-col2">
+            <h3>24/7 Support</h3>
+            <p>Proin iaculis purus consequat sem digni ssim. Sem porttitora entum.</p>
+          </div>
+        </div>
       </div>
       <figure class="col-lg-8 col-sm-6  text-right wow fadeInUp delay-02s">
         <img src="img/macbook-pro.png" alt="">
