@@ -29,11 +29,39 @@ return [
                     ]
                 ],
             ],
+            'validator' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/validator[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\ValidatorController::class,
+                        'action'     => 'string',
+                    ],
+                    'constrains' => [
+                        'action' => '[a-zA-Z0-9_-]* '
+                    ]
+                ],
+            ],
+            'input-filter' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/login[/:action]',
+                    'defaults' => [
+                        'controller' => Controller\InputFilterController::class,
+                        'action'     => 'index',
+                    ],
+                    'constrains' => [
+                        'action' => '[a-zA-Z0-9_-]* '
+                    ]
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\FormElementController::class => InvokableFactory::class,
+            Controller\ValidatorController::class => InvokableFactory::class,
+            Controller\InputFilterController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

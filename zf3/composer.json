@@ -26,7 +26,8 @@
         "zendframework/zend-captcha": "^2.8",
         "zendframework/zend-session": "^2.8",
         "zendframework/zend-text": "^2.7",
-        "zendframework/zend-test": "^3.2"
+        "zendframework/zend-test": "^3.2",
+        "zendframework/zend-validator": "^2.10"
     },
     "autoload": {
         "psr-4": {

@@ -14,12 +14,12 @@ class FormElement extends Form{
       $this->setAttribute('method', 'post');
 
       // (Optionally) set action for this form
-      $this->setAttribute('action', '/about');
+      $this->setAttribute('action', 'form/getFormData');
 
       // Create a text element to capture the MSSV:
       $MSSV = new Element('MSSV');
       $MSSV->setLabel('MSSV');
-      $MSSV->getLabelAttributes([
+      $MSSV->setLabelAttributes([
         'id' => 'MSSV',
         'class' => 'control-label'
       ]);
@@ -35,7 +35,7 @@ class FormElement extends Form{
       // Create a text element to capture the NAME:
       $NAME = new Element('NAME');
       $NAME->setLabel('NAME');
-      $NAME->getLabelAttributes([
+      $NAME->setLabelAttributes([
         'id' => 'NAME',
         'class' => 'control-label'
       ]);
@@ -51,7 +51,7 @@ class FormElement extends Form{
       //Create a Email element
       $EMAIL = new Element('EMAIL');
       $EMAIL->setLabel('EMAIL');
-      $EMAIL->getLabelAttributes([
+      $EMAIL->setLabelAttributes([
         'id' => 'EMAIL',
         'class' => 'control-label'
       ]);
@@ -66,15 +66,16 @@ class FormElement extends Form{
       ]);
 
       //Create Select
-      $SELECT = new Element\Select('mySelect');
+      $SELECT = new Element\Select('MYSELECT');
       $SELECT->setLabel('Pick RFID')
              ->setLabelAttributes([
-                'id' => 'select',
+                // 'id' => 'select',
                 'class'=>'control-label'
              ])
              ->setAttributes([
                 'class' => 'form-control',
                 'id' => 'select',
+                'placeholder' => 'Select One ...',
              ])
              ->setValueOptions([
                 'abcd'=>'ABCD',
@@ -85,12 +86,12 @@ class FormElement extends Form{
       $FILE = new Element\File('myFile');
       $FILE->setLabel('Choose a picture')
            ->setLabelAttributes([
-                'id' => 'image',
+                // 'id' => 'image',
                 'class' => 'control-label',
            ])
            ->setAttributes([
-                'id' => 'image',
-                'class' => 'form-control'
+                //'id' => 'image',
+                'class' => 'form-control-file'
            ]);
 
       //Reset button
@@ -112,15 +113,21 @@ class FormElement extends Form{
                 ]);
 
       //Captcha image
-      $Captcha = new Element\Captcha('captcha');
+      $Captcha = new Element\Captcha('CAPTCHA');
       $Captcha->setCaptcha(new Captcha\Image())
               ->setLabel('Make sure you are human')
               ->getCaptcha()->setImgDir('public/img/captcha')
-                            ->setFont('public/fonts/fontawesome-webfont.ttf')
+                            ->setFont('public/fonts/arial.ttf')
                             ->setImgUrl('img/captcha')
                             ->setSuffix('.png')
-                            ->setExpiration('60')
-                            ->setGcFreq('10');
+                            ->setExpiration(60)
+                            ->setGcFreq(10)
+                            ->setFontSize(24)
+                            ->setWidth(350)
+                            ->setHeight(100)
+                            ->setDotNoiseLevel(40)
+                            ->setLineNoiseLevel(3)
+                            ->setWordlen(4);
 
       $this->add($MSSV);
       $this->add($NAME);

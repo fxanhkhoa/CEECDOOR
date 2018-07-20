@@ -16,12 +16,12 @@
           <?= $this->form()->openTag($form); // <form>?>
 
             <div class="form-group">
-            <?= $this->formRow($MSSV);?>
+            <?= $this->formRow($form->get('MSSV'));?>
             <div class="validation"></div>
             </div>
 
             <div class="form-group">
-            <?= $this->formRow($NAME);?>
+            <?= $this->formRow($form->get('NAME'));?>
             <div class="validation"></div>
             </div>
 
@@ -31,7 +31,7 @@
             </div>
 
             <div class="form-group">
-            <?= $this->formRow($form->get('mySelect'));?>
+            <?= $this->formRow($form->get('MYSELECT'));?>
             <div class="validation"></div>
             </div>
 
@@ -41,7 +41,7 @@
             </div>
 
             <div class="form-group">
-            <?= $this->formRow($form->get('captcha'));?>
+            <?= $this->formRow($form->get('CAPTCHA'));?>
             <div class="validation"></div>
             </div>
 

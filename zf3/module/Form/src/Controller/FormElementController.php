@@ -13,4 +13,23 @@ class FormElementController extends AbstractActionController{
       $view = new ViewModel(['form' => $form]);
       return $view;
   }
+
+  public function getFormDataAction(){
+      $form = new FormElement();
+      $request = $this->getRequest();
+      if ($request->isPost()){
+          $data = $this->params()->fromPost();
+          $file = $request->getFiles();
+          echo "<pre>";
+          print_r($data);
+          echo "</pre>";
+
+          echo "<pre>";
+          print_r($file);
+          echo "</pre>";
+      }
+      $view = new ViewModel(['form' => $form]);
+      $view->setTemplate('form/form-element/get-data');
+      return $view;
+  }
 }
