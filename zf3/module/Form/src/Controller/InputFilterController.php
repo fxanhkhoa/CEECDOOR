@@ -19,9 +19,14 @@ class InputFilterController extends AbstractActionController{
                 $data = $form->getData();
                 print_r($data);
             }
-            else{
-              
-            }
+            // else{
+            //     $messages = $form->getMessages();
+            //     foreach ($messages as $error){
+            //         echo '<pre>';
+            //         print_r($error);
+            //         echo '</pre>';
+            //     }
+            // }
         }
 
         $view = new ViewModel(['form'=>$form]);

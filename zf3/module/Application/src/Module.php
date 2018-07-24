@@ -7,6 +7,8 @@
 
 namespace Application;
 
+use Zend\Mvc\MvcEvent;
+
 class Module
 {
     const VERSION = '3.0.3-dev';
@@ -15,4 +17,14 @@ class Module
     {
         return include __DIR__ . '/../config/module.config.php';
     }
+
+    // public function onBootstrap(MvcEvent $e) {
+    //
+    //     $serviceManager = $e->getApplication()->getServiceManager();
+    //     $viewModel = $e->getApplication()->getMvcEvent()->getViewModel();
+    //
+    //     $myService = $serviceManager->get('Application\Service\Service');
+    //
+    //     $viewModel->globalVar = $myService->getForm();
+    // }
 }

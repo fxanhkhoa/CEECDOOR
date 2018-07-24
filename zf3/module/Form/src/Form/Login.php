@@ -74,8 +74,10 @@ class Login extends Form
 
 
     //Create InputFilter
-    private function loginInputFilter(){
+    private function loginInputFilter()
+    {
         $inputFilter = new InputFilter\InputFilter();
+        $this->setInputFilter($inputFilter);
         $inputFilter->add([
             'name' => 'email',
             'required' => true,
@@ -83,7 +85,8 @@ class Login extends Form
               //Trim - newline
               ['name' => 'StringTrim'],
             ],
-            'validator' => [
+            'validators' => [
+              [
               'name' => 'EmailAddress',
               'options' => [
                   'messages' => [
@@ -91,6 +94,7 @@ class Login extends Form
                       \Zend\Validator\EmailAddress::INVALID_HOSTNAME => 'Hostname ko dung'
                   ]
               ]
+            ]
             ]
         ]);
 
@@ -101,20 +105,21 @@ class Login extends Form
               //Trim - newline
               ['name' => 'StringTrim'],
               ['name' => 'StripTags'],
-              ['name' => 'StripNewlines']
+              ['name' => 'StripNewlines'],
             ],
-            'validator' => [
-              'name' => 'StringLength',
-              'options' => [
-                  'min' => 6,
-                  'max' => 30,
-                  'messages' => [
-                      \Zend\Validator\StringLength::TOO_SHORT => 'Mat khau it nhat %min% ki tu',
-                      \Zend\Validator\StringLength::TOO_LONG => 'Mat khau ko qua %max% ki tu'
-                  ]
+            'validators' => [
+              [
+                'name' => 'StringLength',
+                'options' => [
+                    'min' => 6,
+                    'max' => 30,
+                    'messages' => [
+                        \Zend\Validator\StringLength::TOO_SHORT => 'Mat khau it nhat %min% ki tu',
+                        \Zend\Validator\StringLength::TOO_LONG => 'Mat khau ko qua %max% ki tu'
+                    ]
+                ]
               ]
             ]
         ]);
-
     }
 }

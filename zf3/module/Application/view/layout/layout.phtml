@@ -17,6 +17,7 @@
      <?= $this->headLink(['rel' => 'shortcut icon', 'type' =>
          'image/vnd.microsoft.icon',
          'href' => $this->basePath('favicon.png')])
+         ->prependStylesheet($this->basePath('css/popup-contact.css'))
          ->prependStylesheet($this->basePath('css/style.css'))
          ->prependStylesheet($this->basePath('css/animate.css'))
          ->prependStylesheet($this->basePath('css/bootstrap.css'))
@@ -24,8 +25,12 @@
          ->prependStylesheet($this->basePath('css/responsive.css'))
          ->prependStylesheet($this->basePath('css/magnific-popup.css'))
          ->prependStylesheet($this->basePath('css/bootstrap.min.css'))
-         ->prependStylesheet($this->basePath('https://fonts.googleapis.com/css?family=Montserrat:400,700'))
-         ->prependStylesheet($this->basePath('https://fonts.googleapis.com/css?family=Open+Sans:400,300,800italic,700italic,600italic,400italic,300italic,800,700,600'))
+         ->prependStylesheet($this->basePath('\fonts.googleapis.com/css?family=Montserrat:400,700'))
+         ->prependStylesheet($this->basePath('\fonts.googleapis.com/css?family=Open+Sans:400,300,800italic,700italic,600italic,400italic,300italic,800,700,600'))
+         ->prependStylesheet($this->basePath('\maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css'))
+         ->prependStylesheet($this->basePath('\maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'));
+
+         // ->prependStylesheet($this->basePath('css/form.css'))
       ?>
     <!-- <title>Homepage</title>
     <link rel="icon" href="favicon.png" type="image/png">
@@ -43,6 +48,7 @@
 
     <!-- Scripts -->
       <?= $this->headScript()
+         ->prependFile($this->basePath('js/popup-contact.js'))
          ->prependFile($this->basePath('contactform/contactform.js'))
          ->prependFile($this->basePath('js/magnific-popup.js'))
          ->prependFile($this->basePath('js/classie.js'))
@@ -54,6 +60,9 @@
          ->prependFile($this->basePath('js/bootstrap.min.js'))
          ->prependFile($this->basePath('js/jquery.1.8.3.min.js'))
          ->prependFile($this->basePath('js/popper.min.js'))
+         ->prependFile($this->basePath('\ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js'))
+         ->prependFile($this->basePath('\maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'))
+         ->prependFile($this->basePath('js/form.js'))
       ?>
 
     <!-- <script type="text/javascript" src="js/jquery.1.8.3.min.js"></script>
@@ -96,6 +105,7 @@
           <li><a href=<?php if ($isHome == 0) echo $this->url('home') ?>#client>Clients</a></li>
           <li><a href=<?php if ($isHome == 0) echo $this->url('home') ?>#team>Team</a></li>
           <li><a href=<?php if ($isHome == 0) echo $this->url('home') ?>#contact>Contact</a></li>
+          <button id="contact" type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Sign In</button>
         </ul>
         <a class="res-nav_click" href="#"><i class="fa fa-bars"></i></a>
       </div>
@@ -103,6 +113,50 @@
     <!--main-nav-end-->
 
     <div class="container">
+      <?php
+        $form = $this->layout()->form;
+        // $form = $this->form;
+        $form->setName('login');
+        $form->setAttributes([
+            'class'=>'form-horizontal',
+            'id' => 'login-form',
+            'action' => '#'
+        ]);
+        $form->prepare();
+      ?>
+      <!-- Modal -->
+            <div id="contactForm">
+              <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 fadeInUp delay-01s">
+                  <h2>Login</h2>
+                  <div class="form">
+
+
+                    <?= $this->form()->openTag($form); //<form>?>
+
+                      <div class="form-group">
+                        <?= $this->formLabel($form->get('email'));?>
+                          <?= $this->formElement($form->get('email'));?>
+                          <?= $this->formElementErrors($form->get('email')); ?>
+                      </div>
+                      <div class="form-group">
+                        <?= $this->formLabel($form->get('password'));?>
+                          <?= $this->formElement($form->get('password'));?>
+                          <?= $this->formElementErrors($form->get('password')); ?>
+                      </div>
+                      <div class="form-group">
+                        <?= $this->formLabel($form->get('remember'));?>
+                          <?= $this->formElement($form->get('remember'));?>
+                      </div>
+                      <div class="form-group">
+                        <?= $this->formRow($form->get('submit'));?>
+                      </div>
+
+                      <?= $this->form()->closeTag();//</form> ?>
+                  </div>
+                </div>
+              </div>
+            </div>
       <?=
         $this->content
       ?>

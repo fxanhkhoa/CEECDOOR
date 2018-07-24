@@ -13,16 +13,35 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Model\JsonModel;
 use Zend\Barcode\Barcode;
 use Zend\Router\Http\Regex;
+use Form\Form\Login;
 
 class IndexController extends AbstractActionController
 {
     public function indexAction()
     {
-        // Use a different view template for rendering the page.
-        // $viewModel = new ViewModel();
-        // $viewModel->setTemplate('application/index/about');
-        // return $viewModel;
-        return new ViewModel();
+      $form = new Login();
+
+      if ($this->getRequest()->isPost()){
+          $data = $this->params()->fromPost();
+          $form->setData($data);
+
+          if ($form->isValid()){
+              $data = $form->getData();
+              print_r($data);
+          }
+          // else{
+          //     $messages = $form->getMessages();
+          //     foreach ($messages as $error){
+          //         echo '<pre>';
+          //         print_r($error);
+          //         echo '</pre>';
+          //     }
+          // }
+      }
+      $view = new ViewModel(['form'=>$form]);
+      $this->layout()->setVariable('form', $form); // Set variable to get from layout content by using $this->layout()->form in layout.phtml
+      $view->setTemplate('application/index/index');
+      return $view;
     }
 
     public function aboutAction()

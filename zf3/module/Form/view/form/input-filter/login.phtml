@@ -1,6 +1,6 @@
 <div class="container">
-  <h2>Add Student Form</h2>
-  <h6>Just add CEEC members</h6>
+  <h2>Login</h2>
+  <h6>----------------------------------------</h6>
 <?
 
 $title = 'login - InputFilter';
@@ -25,15 +25,17 @@ $form->prepare();
 
             <div class="form-group">
               <?= $this->formLabel($form->get('email'));?>
-                <?= $this->FormElement($form->get('email'));?>
+                <?= $this->formElement($form->get('email'));?>
+                <?= $this->formElementErrors($form->get('email')); ?>
             </div>
             <div class="form-group">
               <?= $this->formLabel($form->get('password'));?>
-                <?= $this->FormElement($form->get('password'));?>
+                <?= $this->formElement($form->get('password'));?>
+                <?= $this->formElementErrors($form->get('password')); ?>
             </div>
             <div class="form-group">
               <?= $this->formLabel($form->get('remember'));?>
-                <?= $this->FormElement($form->get('remember'));?>
+                <?= $this->formElement($form->get('remember'));?>
             </div>
             <div class="form-group">
               <?= $this->formRow($form->get('submit'));?>
