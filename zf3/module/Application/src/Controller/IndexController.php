@@ -49,11 +49,24 @@ class IndexController extends AbstractActionController
         $appName = 'CEEC';
         $appDescription = 'A sample application for the Using Zend Framework 3 book';
 
+        $form = new Login();
+
+        if ($this->getRequest()->isPost()){
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()){
+                $data = $form->getData();
+                print_r($data);
+            }
+        }
         // Return variables to view script with the help of
         // ViewModel variable container
+        $this->layout()->setVariable('form', $form);
         return new ViewModel([
           'appName' => $appName,
-          'appDescription' => $appDescription
+          'appDescription' => $appDescription,
+          'form' => $form
         ]);
 
     }

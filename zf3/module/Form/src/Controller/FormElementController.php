@@ -10,7 +10,7 @@ class FormElementController extends AbstractActionController{
 
   public function indexAction(){
       $form = new FormElement();
-      $view = new ViewModel(['form' => $form]);
+      $view = new ViewModel(['form1' => $form]);
       return $view;
   }
 
