@@ -1,0 +1,39 @@
+<div class="container">
+  <h2>Upload Multiple File</h2>
+  <h6>----------------------------------------</h6>
+<?=
+
+
+$this->headTitle('Upload Multi Files');
+
+$form = $this->form;
+$form->setAttributes([
+    'enctype'=> 'multipart/form-data',
+    'action' => $this->url('file',[
+        'controller'=>'Controller\UploadFileController',
+        'action'=>'uploadMultiple',
+    ]),
+    'method'=>'POST',
+]);
+$form->prepare();
+?>
+
+    <div class="row">
+      <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 wow fadeInUp delay-05s">
+        <div class="form">
+
+
+          <?= $this->form()->openTag($form); //<form>?>
+          <div class="form-group">
+              <?= $this->formRow($form->get('file-upload'));?>
+          </div>
+
+          <div class="form-group">
+              <?= $this->formRow($form->get('submit'));?>
+          </div>
+
+          <?= $this->form()->closeTag();//</form> ?>
+        </div>
+      </div>
+    </div>
+</div>
