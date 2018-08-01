@@ -17,6 +17,7 @@ class FormElement extends Form
 
         // (Optionally) set action for this form
         $this->setAttribute('action', 'form/getFormData');
+        $this->setAttribute('class', 'contactForm');
 
         // Create a text element to capture the MSSV:
         $MSSV = new Element('MSSV');
@@ -54,7 +55,7 @@ class FormElement extends Form
         $EMAIL = new Element('EMAIL');
         $EMAIL->setLabel('EMAIL');
         $EMAIL->setLabelAttributes([
-            'id' => 'EMAIL',
+            'for' => 'EMAIL',
             'class' => 'control-label',
         ]);
         $EMAIL->setAttributes([
@@ -71,13 +72,15 @@ class FormElement extends Form
         $SELECT = new Element\Select('MYSELECT');
         $SELECT->setLabel('Pick RFID')
             ->setLabelAttributes([
-                // 'id' => 'select',
+                'for' => 'select',
                 'class' => 'control-label',
             ])
             ->setAttributes([
-                'class' => 'form-control',
+                //'class' => 'form-control',
+                //'multiple' => true,
                 'id' => 'select',
                 'placeholder' => 'Select One ...',
+                'required'=>true,
             ])
             ->setValueOptions([
                 'abcd' => 'ABCD',

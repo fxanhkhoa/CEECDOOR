@@ -18,4 +18,5 @@ return [
     'Zend\Form',
     'Application',
     'Form',
+    'Database',
 ];

@@ -2,7 +2,7 @@
   <h2>Add Student Form</h2>
   <h6>Just add CEEC members</h6>
   <?php
-
+    $this->headTitle('Form');
     $form = $this->form1;
     $MSSV = $form->get('MSSV');
     $NAME = $form->get('NAME');
@@ -11,8 +11,6 @@
   <div class="row">
     <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 wow fadeInUp delay-05s">
       <div class="form">
-        <div id="sendmessage">Your message has been sent. Thank you!</div>
-        <div id="errormessage"></div>
         <?=$this->form()->openTag($form); // <form>?>
 
           <div class="form-group">
@@ -32,14 +30,14 @@
 
           <div class="form-group">
             <?=$this->formRow($form->get('MYSELECT'));?>
-              <div class="validation"></div>
+              <!-- <div class="validation"></div> -->
           </div>
-
+          
           <div class="form-group">
             <?=$this->formRow($form->get('myFile'));?>
               <div class="validation"></div>
           </div>
-
+    
           <div class="form-group">
             <?=$this->formRow($form->get('CAPTCHA'));?>
               <div class="validation"></div>

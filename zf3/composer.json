@@ -34,7 +34,8 @@
     "autoload": {
         "psr-4": {
             "Application\\": "module/Application/src/",
-            "Form\\": "module/Form/src/"
+            "Form\\": "module/Form/src/",
+            "Database\\": "module/Database/src/"
         }
     },
     "autoload-dev": {
