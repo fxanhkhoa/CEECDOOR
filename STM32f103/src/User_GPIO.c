@@ -23,11 +23,16 @@ void User_GPIO_Init() {
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
 	/*--------------------GPIOC-----------------*/
+	//button
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 |GPIO_Pin_15;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
-	
+	/*--------------------GPIOB------------------*/
+	GPIO_InitStructure.GPIO_Pin = ESP_Available_Pin;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+  GPIO_Init(GPIO_ESP, &GPIO_InitStructure);
 	
 }
 

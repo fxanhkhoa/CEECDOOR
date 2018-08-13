@@ -26,3 +26,4 @@
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdarg.h
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\main.o: D:\ProgramInstallation\Keilcv5\Core\ARM\ARMCC\Bin\..\include\ctype.h
+.\objects\main.o: .\inc\stm32f10x_iwdg.h

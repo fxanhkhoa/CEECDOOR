@@ -37,6 +37,9 @@ switch: GPIOA (1) // cong tac hanh trinh
 
 #define SWITCH_Pin GPIO_Pin_1
 
+#define GPIO_ESP GPIOB
+#define ESP_Available_Pin GPIO_Pin_9
+
 static GPIO_InitTypeDef GPIO_InitStructure;
 
 /*---------------------------

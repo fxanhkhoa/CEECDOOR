@@ -1,8 +1,4 @@
 /*
-ADC0 : sensor kiem tra xem co the dong duoc cua hay chua
-ADC1 : kiem tra tinh trang then cua
-ADC2 : reserved
-
 Button 1 : mo cua
 Button 2 : tat bao dong
 */
@@ -42,6 +38,11 @@ Button 2 : tat bao dong
 #define PAGE3 3
 #define PAGE4 4
 
+#define LENGTH_ID 5
+
+#define REMOVE 0
+#define ADD 1
+
 /*========Variable==============*/
 
 // page 0
@@ -58,9 +59,8 @@ extern volatile uint8_t Enter_pass_remove_alert;//flag allow enter password to r
 
 extern uint8_t Door_status;//door's status (open or close)
 
-extern uint8_t Wrong_Nbr_ID;
 
-extern char TempBuff[50];
+extern char TempBuff[100];
 
 extern volatile uint16_t buff_pos;
 extern volatile uint16_t buff[100];
@@ -78,6 +78,79 @@ extern volatile uint8_t OneTouchMode_flag;
 
 extern volatile uint8_t OpenDoorUSART_flag;
 
+//==============================esp8266=====================
+#define CAN_NOT_CONVERT -1
+
+//define command to esp
+#define PUSH_ID '0' //enable push id
+#define CHECK_DOOR '1' //enable check door
+#define WRITE_CLOSE_DOOR '2' //enable write "CLOSE" to file
+#define CHECK_SQL '3' //enable check sql
+#define RESET_FILE_SQL '4' //enable write "" to file
+#define CONNECT_WIFI '5' //enable connect to wifi
+#define CHECK_WIFI '6' //enable check wifi's connection
+#define GET_SQL_STATUS '7' //cmd usart
+#define GET_DOOR_STATUS '8' //cmd usart
+
+extern uint8_t Update_Door_Flag;
+
+extern uint8_t Update_Sql_Flag;
+
+
+int Convert_Char_Hex_To_Dec(char ch);
+int Convert_String_Hex_To_Dec(char *str);
+
+char *Convert_Dec_To_String_Hex(uint8_t num);
+
+char *Convert_Id_To_String(uint8_t *Id);
+uint8_t *Convert_String_To_Id(char *str);
+
+extern const char* SSID;
+extern const char* PASS;
+
+void Connect_Wifi(char *id, char *password);
+uint8_t Check_Wifi(void);
+
+void Push_Id(uint8_t* Id);
+
+void Update_Door_Status(void); //get door status on server end store in esp
+/*get door status
+*return OPEN or CLOSE
+*/
+uint8_t Get_Door_Status(void); 
+void Write_Close_Door(void);
+
+void Update_Sql_Status(void);
+char* Get_Sql_Status(void);
+void Write_None_Sql(void);
+
+/*
+*	used for parsed ID form esp
+* Att: REMOVE or ADD
+* content ID[LENGTH_ID]
+*/
+struct ID_PACKAGE {
+	uint8_t _Att; //attribute [REMOVE] or [ADD]
+	uint8_t _ID[LENGTH_ID];
+};
+
+/*
+* Parse the string content [Attribute]ID
+* Start_Pos is the start position in string to parse
+* return struct ID_PACKAGE
+*/
+
+struct ID_PACKAGE* Parse_Id(char* String_Id, uint16_t Start_Pos);
+
+void Process_Id_From_Esp(void);
+
+uint8_t ESP_Available(void);
+
+#define COUNT_ESP_MAX 1000
+
+extern uint8_t Prevent_Increase_Count_Waite_Esp;
+extern uint16_t Count_Wait_Esp; //this variable will count times esp busy. if it reach COUNT_ESP_MAX it won't wait
+
 //======================printf()====================
 
 /*--------------------printf()-----------------------------*/
@@ -93,11 +166,6 @@ struct __FILE {
 static FILE __stdout;
 
 int fputc(int ch, FILE *f);
-
-//======================User_printf()----------------
-//testing....
-void User_printf(char *,...); 				//Our printf function
-char* convert(unsigned int, int); 		//Convert integer number into octal, hex, etc.
 
 //===================convert data=================
 uint16_t* ConvertCharToUint16(char *s);
@@ -128,70 +196,42 @@ void Updata_Data_From_PAGE0(void);
 
 extern void Display_PAGE0(void);
 
-//=======================PAGE 1====================
+//=======================READ and WRITE ID function prototype====================
+
+/*
+*	each pos will content 5 uint16_t variable (10 bytes) <=> 5pos in flash
+*/
+uint8_t* Read_Id_From_Page (uint8_t Pos, uint8_t Page);
+void Write_Id_To_Page (uint8_t* Id, uint8_t Pos, uint8_t Page);
+
+//=======================Compare 2 ID=======================
+uint8_t Compare_Id (uint8_t* ID1, uint8_t* ID2);
+
+//=======================PAGE 1 2 3====================
+
 // SIZE: 2bytes/ID[index]; 10bytes/ID <=> 5pos/ID
 /*
 -	Add new ID[5] into flash
 */
-void Add_ID (uint8_t* InID);
+void Add_Id (uint8_t* In_Id);
 /*
 -	compare InputID[5] vs list ID in flash
 - return -1 as not found, else this is ID'index in flash
 */
-int8_t Search_ID (uint8_t* InID);
+int16_t Search_Id (uint8_t* In_Id);
 /*
 -	pick a ID[5] from flash
 - return Null if not found
 */
-uint8_t* Pick_ID (uint8_t index);
+uint8_t* Pick_Id (uint16_t index);
 /*
 - remove a ID from flash base on index
 */
-void Remove_ID (uint8_t index);
-//=======================PAGE 2====================
-// SIZE: 2bytes/Name[index]; 20bytes/Name <=> 10pos/Name
-/*
--	Add new Name[10] into flash
-*/
-void Add_Name (uint8_t* InName);
-/*
--	compare InputName[10] vs list Name in flash
-- return -1 as not found, else this is Name'index in flash
-*/
-int8_t Search_Name (uint8_t* InName);
-/*
--	pick a Name[10] from flash
-- return Null if not found
-*/
-uint8_t* Pick_Name (uint8_t index);
-/*
-- remove a Name from flash base on index
-*/
-void Remove_Name (uint8_t index);
-//=======================PAGE 3====================
-// SIZE: 4bytes/MSSV <=> 2pos/MSSV
-/*
--	Add new MSSV into flash
-*/
-void Add_MSSV (uint32_t InMSSV);
-/*
--	compare MSSV vs list MSSV in flash
-- return -1 as not found, else this is MSSV'index in flash
-*/
-int8_t Search_MSSV (uint32_t MSSV);
-/*
--	pick a MSSV from flash
-- return Null if not found
-*/
-uint32_t Pick_MSSV (uint8_t index);
-/*
-- remove a MSSV from flash base on index
-*/
-void Remove_MSSV (uint8_t index);
+void Remove_Id(uint16_t index);
 
 /*-----------------For all function above--------------*/
 void Add_Mem_Procedure(void);
-void Add_NewMem(uint8_t* InID,uint8_t* InName,uint32_t InMSSV);
+void Add_NewMem(uint8_t* InID);
 void Remove_Mem_Procedure(void);
 void Remove_Mem(uint8_t index);
 void Display_ID(uint8_t index);
@@ -237,7 +277,7 @@ void Alert(void);
 /*
 reset a array uint16_t to '\0', length
 */
-void ResetArr(uint16_t* arr, uint8_t leng);
+void ResetArr(uint16_t* arr, uint32_t leng);
 
 /*
 compare password

@@ -17,5 +17,7 @@ Button 2 : tat bao dong
 
 #include "User_Control.h"
 
+#include "stm32f10x_iwdg.h"
+
 #endif /*__MAIN_H */
 /*******END OF FILE****/

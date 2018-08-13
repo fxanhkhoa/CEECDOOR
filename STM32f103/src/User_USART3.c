@@ -95,7 +95,7 @@ uint16_t *User_USART3_ReceiveString(char *des, char delim, uint16_t leng) {
 	uint8_t buff_pos;
 	//Init value
 	for (i=0; i<100; i++) {
-		buff[i]='\0';
+		buff[i]=0x00;
 	}
 	buff_pos=0;
 	while (buff_pos<leng) { //until reach enough length or buff[lastest byte]==delim
@@ -111,7 +111,7 @@ uint16_t *User_USART3_ReceiveString(char *des, char delim, uint16_t leng) {
 	//copy to des
 	for (i=0; buff[i]; i++)
 		des[i]=buff[i];
-	des[i]='\0';
+	des[i]=0x00;
 	
 	return (uint16_t *) buff;
 }

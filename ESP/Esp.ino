@@ -12,7 +12,7 @@
  * ON: esp available
  * OFF: esp busy
 */
-#define AVAILABLE_PIN 15
+#define AVAILABLE_PIN 2
 
 //define bit flag
 #define PUSH_ID_BIT 0 //push id to server
@@ -87,40 +87,33 @@ void ProcessPushID(void);
  * Send "READY." start
  * receive a string from stm
  * storage in InString(200 max leng)
- * Send "OK." or "ERROR." ket thuc
 */
 String InString="";
 void ReceiveString(uint8_t leng, char delim);
 /*
- * Send "READY." start
  * check the status_door file
- * if content OPEN send OPEN. to stm
- * if content CLOSE send CLOSE. to stm
- * if fail will retry 3 times before send ERROR.
+ * if content OPEN storage OPEN. to esp
+ * if content CLOSE storage CLOSE. to esp
+ * if fail will retry 3 times before exit and storage CLOSE. in esp
 */
 void ProcessCheckDoor();
 /*
- * Send "READY." start
  * Write "CLOSE" to door_status file server
- * Send "OK." or "ERROR."
  */
 void WriteCloseDoor();
 /*
- * Send "READY." start
  * check the status_sql file
  * status_sql's structure: [attribute]ID[attribute]ID....
  * Ex: [A]HGUTYRTGHD[R]URYTHHFNGH
  * Explain: A stand for added ID
  *          R stand for removed ID
- * if file no content send NONE. to stm
+ * if file no content storage NONE. in esp
  * Send [attribute]ID[attribute]ID.
- * if fail will retry 3 times before send ERROR.
+ * if fail will retry 3 times before exit and storage NONE. in esp
  */
 void ProcessCheckSql();
 /*
- * Send "READY." start
  * Write "" (None string) to sql_status file in server
- * Send "OK." or "ERROR."
  */
 void WriteNoneSql();
 
@@ -248,7 +241,6 @@ void ProcessPushID(void) {
     //if send successful
     if(httpCode==200 && payload =="OK") {
       NbrRetry=0;
-      Serial.print("OK.");
       return;
     }
     else {
@@ -256,7 +248,6 @@ void ProcessPushID(void) {
     }
   }
   NbrRetry=0;
-  Serial.print("ERROR.");
 }
 
 void ReceiveString(uint8_t leng, char delim) {
@@ -273,7 +264,6 @@ void ReceiveString(uint8_t leng, char delim) {
 }
 
 void ProcessCheckDoor() {
-  Serial.print("READY.");
   NbrRetry=0;
   while(NbrRetry<=2) { //try to send 2 times if fail
     HTTPClient http;
@@ -286,7 +276,6 @@ void ProcessCheckDoor() {
     if(httpCode==200 && (payload =="OPEN" || payload =="CLOSE")) {
       NbrRetry=0;
       door_status=payload+'.';
-      Serial.print(payload+'.');
       return;
     }
     else {
@@ -295,11 +284,9 @@ void ProcessCheckDoor() {
   }
   NbrRetry=0;
   door_status="CLOSE."; //prevent no connection to server
-  Serial.print("ERROR.");
 }
 
 void WriteCloseDoor() {
-  Serial.print("READY.");
   NbrRetry=0;
   while(NbrRetry<=2) { //try to send 2 times if fail
     HTTPClient http;
@@ -311,7 +298,6 @@ void WriteCloseDoor() {
     if(httpCode==200) {
       door_status="CLOSE."; //incase stm want to read immediately
       NbrRetry=0;
-      Serial.print("OK.");
       return;
     }
     else {
@@ -320,11 +306,9 @@ void WriteCloseDoor() {
   }
   NbrRetry=0;
   door_status="CLOSE."; //prevent no connection to server
-  Serial.print("ERROR.");
 }
 
 void ProcessCheckSql() {
-  Serial.print("READY.");
   NbrRetry=0;
   while(NbrRetry<=2) { //try to send 2 times if fail
     HTTPClient http;
@@ -338,11 +322,9 @@ void ProcessCheckSql() {
       NbrRetry=0;
       if(payload.length()==0) {
         sql_status="NONE."; //incase stm want to get data immediately
-        Serial.print("NONE.");
       }
       else {
         sql_status=payload+'.'; //incase stm want to get data immediately
-        Serial.print(payload+'.');
         bitSet(Flag,ABLE_WRITE_NONE_SQL_BIT); //neu qua trinh thanh cong thi co the write "" to sql_status in server
       }
       return;
@@ -354,11 +336,9 @@ void ProcessCheckSql() {
   NbrRetry=0;
   bitClear(Flag,ABLE_WRITE_NONE_SQL_BIT); //fail => prevent write "" to sql_status
   sql_status="NONE."; //prevent no connection to server
-  Serial.print("ERROR.");
 }
 
 void WriteNoneSql() {
-  Serial.print("READY.");
   NbrRetry=0;
   while(NbrRetry<=2 && bitRead(Flag,ABLE_WRITE_NONE_SQL_BIT)) { //try to send 2 times if fail and if able to write
     HTTPClient http;
@@ -369,7 +349,6 @@ void WriteNoneSql() {
     //if send successful
     if(httpCode==200) {
       NbrRetry=0;
-      Serial.print("OK.");
       return;
     }
     else {
@@ -377,7 +356,6 @@ void WriteNoneSql() {
     }
   }
   NbrRetry=0;
-  Serial.print("ERROR.");
 }
 
 void ConnectWifi (void) {
@@ -394,13 +372,6 @@ void ConnectWifi (void) {
     pass[i]=(char)InString[i];
   }
   WiFi.begin(id, pass);
-  delay(5000);
-  if(WiFi.status() != WL_CONNECTED) {
-    Serial.print("ERROR.");
-  }
-  else {
-    Serial.print("OK.");
-  }
 }
 
 void CheckConnectWifi(void) {
