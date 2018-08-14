@@ -41,6 +41,7 @@ class IndexController extends AbstractActionController
       $view = new ViewModel(['form'=>$form]);
       $this->layout()->setVariable('form', $form); // Set variable to get from layout content by using $this->layout()->form in layout.phtml
       $view->setTemplate('application/index/index');
+    //   print_r($view);
       return $view;
     }
 
@@ -63,12 +64,13 @@ class IndexController extends AbstractActionController
         // Return variables to view script with the help of
         // ViewModel variable container
         $this->layout()->setVariable('form', $form);
-        return new ViewModel([
+        $view = new ViewModel([
           'appName' => $appName,
           'appDescription' => $appDescription,
-          'form' => $form
+        //   'form' => $form
         ]);
-
+        // print_r($view);
+        return $view;
     }
 
     public function checkAction()

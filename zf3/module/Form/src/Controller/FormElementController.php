@@ -11,6 +11,7 @@ class FormElementController extends AbstractActionController{
   public function indexAction(){
       $form = new FormElement();
       $view = new ViewModel(['form1' => $form]);
+    //   echo __DIR__;
       return $view;
   }
 

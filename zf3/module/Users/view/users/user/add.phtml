@@ -1,0 +1,81 @@
+<?php
+$title = "Add";
+$this->headTitle($title);
+$form = $this->form;
+$form->prepare();
+?>
+<?= $this->flashMessenger()->render('success',['alert', 'alert-success']); ?>
+<div class="row">
+    <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 col-md-offset-3 wow fadeInUp delay-05s">
+        <div class="form">
+            <h2><?= $this->escapeHtml($title)?></h2>
+            <?= $this->form()->openTag($form); // <form>?>
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('username'));?>
+                    <?= $this->formElement($form->get('username'));?>
+                    <?= $this->formElementErrors($form->get('username')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('password'));?>
+                    <?= $this->formElement($form->get('password'));?>
+                    <?= $this->formElementErrors($form->get('password')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('confirm_password'));?>
+                    <?= $this->formElement($form->get('confirm_password'));?>
+                    <?= $this->formElementErrors($form->get('confirm_password')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('fullname'));?>
+                    <?= $this->formElement($form->get('fullname'));?>
+                    <?= $this->formElementErrors($form->get('fullname')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('birthday'));?>
+                    <?= $this->formElement($form->get('birthday'));?>
+                    <?= $this->formElementErrors($form->get('birthday')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('gender'));?>
+                    <br>
+                    <?= $this->formElement($form->get('gender'));?>
+                    <?= $this->formElementErrors($form->get('gender')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('address'));?>
+                    <?= $this->formElement($form->get('address'));?>
+                    <?= $this->formElementErrors($form->get('address')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('email'));?>
+                    <?= $this->formElement($form->get('email'));?>
+                    <?= $this->formElementErrors($form->get('email')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('phone'));?>
+                    <?= $this->formElement($form->get('phone'));?>
+                    <?= $this->formElementErrors($form->get('phone')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('role'));?>
+                    <?= $this->formElement($form->get('role'));?>
+                    <?= $this->formElementErrors($form->get('role')); ?>
+                </div>
+
+                <div class="text-right">
+                    <?=$this->formRow($form->get('btnSubmit'));?>
+                </div>
+
+            <?= $this->form()->closeTag($form); // </form>?>
+        </div>
+    </div>
+</div>

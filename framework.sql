@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 30, 2018 at 05:28 AM
+-- Generation Time: Aug 14, 2018 at 12:47 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -67,6 +67,25 @@ CREATE TABLE `USERINFO` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `id` int(10) NOT NULL,
+  `USERNAME` varchar(20) COLLATE utf8_vietnamese_ci NOT NULL,
+  `PASSWORD` varchar(200) COLLATE utf8_vietnamese_ci NOT NULL,
+  `FULLNAME` varchar(70) COLLATE utf8_vietnamese_ci NOT NULL,
+  `BIRTHDAY` date NOT NULL,
+  `GENDER` varchar(10) COLLATE utf8_vietnamese_ci NOT NULL,
+  `ADDRESS` varchar(200) COLLATE utf8_vietnamese_ci NOT NULL,
+  `EMAIL` varchar(80) COLLATE utf8_vietnamese_ci NOT NULL,
+  `PHONE` varchar(15) COLLATE utf8_vietnamese_ci NOT NULL,
+  `ROLE` varchar(100) COLLATE utf8_vietnamese_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_vietnamese_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `USERUSAGE`
 --
 
@@ -113,10 +132,26 @@ ALTER TABLE `USERINFO`
   ADD PRIMARY KEY (`MSSV`);
 
 --
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`) USING BTREE;
+
+--
 -- Indexes for table `USERUSAGE`
 --
 ALTER TABLE `USERUSAGE`
   ADD PRIMARY KEY (`MSSV`,`RFID`) USING BTREE;
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

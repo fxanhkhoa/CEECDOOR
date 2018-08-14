@@ -1,0 +1,34 @@
+<?php
+$title = 'List User';
+$this->headTitle($title);
+$users = $this->users;
+?>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>STT</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Fullname</th>
+            <th>Birthday</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php $stt = 1;
+        foreach($users as $user): ?>
+        <tr>
+            <td><?= $stt;  ?></td>
+            <td><?= $this->escapeHtml($user->getUSERNAME());  ?></td>
+            <td><?= $this->escapeHtml($user->getEMAIL());  ?></td>
+            <td><?= $this->escapeHtml($user->getFULLNAME());  ?></td>
+            <td><?= $user->getBIRTHDAY()->format('d-m-Y');  ?></td>
+            <td><?= $this->escapeHtml($user->getPHONE());  ?></td>
+        </tr>
+        <?php 
+            $stt++;
+            endforeach;
+        ?>
+    </tbody>
+</table>
