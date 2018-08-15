@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Aug 14, 2018 at 12:47 PM
+-- Generation Time: Aug 15, 2018 at 01:09 PM
 -- Server version: 10.1.33-MariaDB
 -- PHP Version: 7.2.6
 
@@ -74,6 +74,7 @@ CREATE TABLE `users` (
   `id` int(10) NOT NULL,
   `USERNAME` varchar(20) COLLATE utf8_vietnamese_ci NOT NULL,
   `PASSWORD` varchar(200) COLLATE utf8_vietnamese_ci NOT NULL,
+  `RFID` varchar(10) COLLATE utf8_vietnamese_ci NOT NULL,
   `FULLNAME` varchar(70) COLLATE utf8_vietnamese_ci NOT NULL,
   `BIRTHDAY` date NOT NULL,
   `GENDER` varchar(10) COLLATE utf8_vietnamese_ci NOT NULL,
@@ -83,6 +84,13 @@ CREATE TABLE `users` (
   `ROLE` varchar(100) COLLATE utf8_vietnamese_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_vietnamese_ci;
 
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `USERNAME`, `PASSWORD`, `RFID`, `FULLNAME`, `BIRTHDAY`, `GENDER`, `ADDRESS`, `EMAIL`, `PHONE`, `ROLE`) VALUES
+(1, '15520364', '$2y$10$KpfvxD8rAhOKbz9qkevoC.NEnpxqHmL3no58jgUS8DxlkYu9q7Qcm', '1A2B3C4D', 'Bùi Anh Khoa', '1996-02-03', 'male', '108/21 Phan Huy Ích Phường 15 Tân Bình', 'fxanhkhoa@gmail.com', '01222912970', 'admin');
+
 -- --------------------------------------------------------
 
 --
@@ -90,7 +98,8 @@ CREATE TABLE `users` (
 --
 
 CREATE TABLE `USERUSAGE` (
-  `MSSV` int(10) NOT NULL,
+  `ID` int(15) NOT NULL,
+  `USERNAME` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
   `TIME` time(6) NOT NULL,
   `DAY` date NOT NULL,
   `RFID` varchar(8) COLLATE utf8_unicode_ci NOT NULL,
@@ -101,19 +110,8 @@ CREATE TABLE `USERUSAGE` (
 -- Dumping data for table `USERUSAGE`
 --
 
-INSERT INTO `USERUSAGE` (`MSSV`, `TIME`, `DAY`, `RFID`, `GHICHU`) VALUES
-(1520364, '00:00:00.000000', '2018-07-17', 'ABCD', 'đang test'),
-(1928811, '00:00:00.000000', '0000-00-00', 'BBBB', 'dang test too'),
-(12334521, '03:00:00.000000', '0000-00-00', 'BBGF', 'qwerty'),
-(14520022, '18:00:00.000000', '0000-00-00', 'GHFE', '12345'),
-(14520031, '16:18:33.000000', '0000-00-00', 'QWER', 'dang test'),
-(15520054, '03:00:00.000000', '0000-00-00', 'AGGG', 'qwer'),
-(15520331, '16:18:33.000000', '0000-00-00', 'WEQR', 'dang test'),
-(15520345, '06:00:00.000000', '0000-00-00', 'WEQQ', 'asdf'),
-(15520366, '00:00:00.000000', '0000-00-00', 'ABBB', 'Đang test'),
-(15520456, '17:00:00.000000', '0000-00-00', 'RTER', 'dang test'),
-(15526789, '00:00:00.000000', '0000-00-00', 'QQQQ', '123'),
-(16599281, '15:00:00.000000', '0000-00-00', 'RRRR', '1234');
+INSERT INTO `USERUSAGE` (`ID`, `USERNAME`, `TIME`, `DAY`, `RFID`, `GHICHU`) VALUES
+(1, '15520364', '16:00:32.000000', '2018-08-15', '1A2B3C4D', 'nothing');
 
 --
 -- Indexes for dumped tables
@@ -141,7 +139,7 @@ ALTER TABLE `users`
 -- Indexes for table `USERUSAGE`
 --
 ALTER TABLE `USERUSAGE`
-  ADD PRIMARY KEY (`MSSV`,`RFID`) USING BTREE;
+  ADD PRIMARY KEY (`ID`) USING BTREE;
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -151,7 +149,13 @@ ALTER TABLE `USERUSAGE`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `USERUSAGE`
+--
+ALTER TABLE `USERUSAGE`
+  MODIFY `ID` int(15) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

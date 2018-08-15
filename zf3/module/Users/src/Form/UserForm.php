@@ -39,38 +39,58 @@ class UserForm extends Form{
                 ]
             ],
         ]);
+        
+        if ($this->action == 'add'){
+            //password
+            $this->add([
+                'type'=>'password',
+                'name'=>'password',
+                'attributes'=>[
+                    'class'=>'form-control',
+                    'placeholder'=>'Input Password',
+                    'id'=>'password',
+                ],
+                'options'=>[
+                    'label'=>'Password:',
+                    'label_attributes'=>[
+                        'for'=>'password',
+                        'class'=>' control-label',
+                    ]
+                ],
+            ]);
 
-        //password
+            //Confirm_password
+            $this->add([
+                'type'=>'password',
+                'name'=>'confirm_password',
+                'attributes'=>[
+                    'class'=>'form-control',
+                    'placeholder'=>'Input Password again',
+                    'id'=>'confirm_password',
+                ],
+                'options'=>[
+                    'label'=>'Repassword',
+                    'label_attributes'=>[
+                        'for'=>'confirm_password',
+                        'class'=>' control-label',
+                    ]
+                ],
+            ]);
+        }
+
+        //RFID
         $this->add([
-            'type'=>'password',
-            'name'=>'password',
+            'type'=>'text',
+            'name'=>'rfid',
             'attributes'=>[
                 'class'=>'form-control',
-                'placeholder'=>'Input Password',
-                'id'=>'password',
+                'placeholder'=>'Input RFID',
+                'id'=>'rfid',
             ],
             'options'=>[
-                'label'=>'Password:',
+                'label'=>'RFID',
                 'label_attributes'=>[
-                    'for'=>'password',
-                    'class'=>' control-label',
-                ]
-            ],
-        ]);
-
-        //Confirm_password
-        $this->add([
-            'type'=>'password',
-            'name'=>'confirm_password',
-            'attributes'=>[
-                'class'=>'form-control',
-                'placeholder'=>'Input Password again',
-                'id'=>'confirm_password',
-            ],
-            'options'=>[
-                'label'=>'Repassword',
-                'label_attributes'=>[
-                    'for'=>'confirm_password',
+                    'for'=>'rfid',
                     'class'=>' control-label',
                 ]
             ],
@@ -262,54 +282,57 @@ class UserForm extends Form{
             ]
         ]);
 
-        $inputFilter->add([
-            'name'=>'password',
-            'required'=>true,
-            'filters'=>[
-                ['name'=>'StringTrim'],
-                ['name'=>'StripTags'],
-                ['name'=>'StripNewlines'],
-            ],
-            'validators'=>[
-                [
-                    'name'=>'NotEmpty',
-                    'options'=>[
-                        'break_chain_on_failure'=>true,
-                        'messages'=>[
-                            NotEmpty::IS_EMPTY=>'Password can not be empty'
+        if ($this->action == 'add'){
+            $inputFilter->add([
+                'name'=>'password',
+                'required'=>true,
+                'filters'=>[
+                    ['name'=>'StringTrim'],
+                    ['name'=>'StripTags'],
+                    ['name'=>'StripNewlines'],
+                ],
+                'validators'=>[
+                    [
+                        'name'=>'NotEmpty',
+                        'options'=>[
+                            'break_chain_on_failure'=>true,
+                            'messages'=>[
+                                NotEmpty::IS_EMPTY=>'Password can not be empty'
+                            ]
+                        ]
+                    ],
+                    [
+                        'name'=>'StringLength',
+                        'options'=>[
+                            'min'=>8,
+                            'max'=>20
                         ]
                     ]
-                ],
-                [
-                    'name'=>'StringLength',
-                    'options'=>[
-                        'min'=>8,
-                        'max'=>20
-                    ]
                 ]
-            ]
-        ]);
-
-        $inputFilter->add([
-            'name'=>'confirm_password',
-            'required'=>true,
-            'filters'=>[
-                ['name'=>'StringTrim'],
-                ['name'=>'StripTags'],
-                ['name'=>'StripNewlines'],
-            ],
-            'validators'=>[
-                [
-                    'name'=>'NotEmpty',
+            ]);
+    
+            $inputFilter->add([
+                'name'=>'confirm_password',
+                'required'=>true,
+                'filters'=>[
+                    ['name'=>'StringTrim'],
+                    ['name'=>'StripTags'],
+                    ['name'=>'StripNewlines'],
                 ],
-                [
-                    'name'=>'Identical',
-                    'options'=>[
-                        'token'=>'password',
-                    ]
-                ],
-            ]
-        ]);
+                'validators'=>[
+                    [
+                        'name'=>'NotEmpty',
+                    ],
+                    [
+                        'name'=>'Identical',
+                        'options'=>[
+                            'token'=>'password',
+                        ]
+                    ],
+                ]
+            ]);
+        }
+        
 
         $inputFilter->add([
             'name'=>'fullname',

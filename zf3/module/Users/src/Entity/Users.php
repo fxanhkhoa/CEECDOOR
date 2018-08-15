@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Users
 {
-    //`USERNAME`, `PASSWORD`,
+    //`USERNAME`, `PASSWORD`, `RFID`
     //`FULLNAME`, `BIRTHDAY`, `GENDER`, `ADDRESS`, `EMAIL`, `PHONE`, `ROLE`
 
     /**
@@ -21,6 +21,8 @@ class Users
     private $USERNAME;
     /** @ORM\Column(type="string") */
     private $PASSWORD;
+    /** @ORM\Column(type="string") */
+    private $RFID;
     /** @ORM\Column(type="string") */
     private $FULLNAME;
     /** @ORM\Column(type="date") */
@@ -85,6 +87,22 @@ class Users
     public function setPASSWORD($PASSWORD)
     {
         $this->PASSWORD = $PASSWORD;
+    }
+
+    /**
+     * @return
+     */
+    public function getRFID()
+    {
+        return $this->RFID;
+    }
+
+    /**
+     * @param
+     */
+    public function setRFID($RFID)
+    {
+        $this->RFID = $RFID;
     }
 
     /**

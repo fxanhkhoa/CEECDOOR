@@ -3,16 +3,19 @@ $title = 'List User';
 $this->headTitle($title);
 $users = $this->users;
 ?>
-
+<?= $this->flashMessenger()->render('success',['alert', 'alert-success']); ?>
 <table class="table table-hover">
     <thead>
         <tr>
             <th>STT</th>
             <th>Username</th>
+            <th>RFID</th>
             <th>Email</th>
             <th>Fullname</th>
             <th>Birthday</th>
             <th>Phone</th>
+            <th>Role</th>
+            <th>Option</th>
         </tr>
     </thead>
     <tbody>
@@ -21,10 +24,16 @@ $users = $this->users;
         <tr>
             <td><?= $stt;  ?></td>
             <td><?= $this->escapeHtml($user->getUSERNAME());  ?></td>
+            <td><?= $this->escapeHtml($user->getRFID());  ?></td>
             <td><?= $this->escapeHtml($user->getEMAIL());  ?></td>
             <td><?= $this->escapeHtml($user->getFULLNAME());  ?></td>
             <td><?= $user->getBIRTHDAY()->format('d-m-Y');  ?></td>
             <td><?= $this->escapeHtml($user->getPHONE());  ?></td>
+            <td><?= $this->escapeHtml($user->getROLE()); ?></td>
+            <td>
+                <a href="<?= $this->url('user',['action'=>'edit','id'=>$this->escapeHtml($user->getId())]) ?>">Edit</a>
+                | Delete
+            </td>
         </tr>
         <?php 
             $stt++;
