@@ -14,6 +14,8 @@ use Zend\View\Model\JsonModel;
 use Zend\Barcode\Barcode;
 use Zend\Router\Http\Regex;
 use Form\Form\Login;
+use Users\Controller\UserController;
+use Application\Database\Database;
 
 class IndexController extends AbstractActionController
 {
@@ -29,16 +31,14 @@ class IndexController extends AbstractActionController
               $data = $form->getData();
               print_r($data);
           }
-          // else{
-          //     $messages = $form->getMessages();
-          //     foreach ($messages as $error){
-          //         echo '<pre>';
-          //         print_r($error);
-          //         echo '</pre>';
-          //     }
-          // }
       }
-      $view = new ViewModel(['form'=>$form]);
+
+      //Get data from USERUSAGE
+      date_default_timezone_set("Asia/Ho_Chi_Minh");
+      $database = new Database();
+      $users = $database->getHistory();
+
+      $view = new ViewModel(['users'=>$users]);
       $this->layout()->setVariable('form', $form); // Set variable to get from layout content by using $this->layout()->form in layout.phtml
       $view->setTemplate('application/index/index');
     //   print_r($view);

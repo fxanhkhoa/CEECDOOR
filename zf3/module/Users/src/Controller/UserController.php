@@ -6,6 +6,8 @@ use Zend\View\Model\ViewModel;
 use Users\Entity\Users;
 use Users\Form\UserForm;
 use Users\Form\UsersUsageForm;
+use Users\Form\ChangePasswordForm;
+use Users\Form\ResetPasswordForm;
 
 class UserController extends AbstractActionController{
 
@@ -18,6 +20,7 @@ class UserController extends AbstractActionController{
     }
 
     public function indexAction(){
+        date_default_timezone_set("Asia/Ho_Chi_Minh");
         $users = $this->entityManager->getRepository(Users::class)->findAll();
         //$users = $this->entityManager->getRepository(Users::class)->findBy([]);
         $view = new ViewModel(['users'=>$users]);
@@ -31,7 +34,7 @@ class UserController extends AbstractActionController{
     public function addAction(){
         $form = new UserForm('add');
         date_default_timezone_set("Asia/Ho_Chi_Minh");
-        echo date("Y-m-d");
+        // echo date("Y-m-d");
         if ($this->getRequest()->isPost()){
             $data = $this->params()->fromPost();
             $form->setData($data);
@@ -103,10 +106,87 @@ class UserController extends AbstractActionController{
         }
     }
 
+    public function deleteAction(){
+        $idUser = $this->params()->fromRoute('id',0);
+        if ($idUser <= 0){
+            $this->getReponse()->setStatusCode('404');
+            return;
+        }
+
+        //Get user info
+        $user = $this->entityManager->getRepository(Users::class)->find($idUser);
+        if (!$user){
+            $this->getReponse()->setStatusCode('404');
+            return;
+        }
+
+        if ($this->getRequest()->isPost()){
+            $btn = $this->getRequest()->getPost('delete', 'No');
+            if ($btn == 'Yes'){
+                $this->userManager->removeUser($user);
+                $this->flashMessenger()->addSuccessMessage('Delete Successfully');
+            }
+            return $this->redirect()->toRoute('user');
+        }
+
+        return new ViewModel(['user'=>$user]);
+    }
+
+    public function changePasswordAction(){
+        $idUser = $this->params()->fromRoute('id',0);
+        if ($idUser <= 0){
+            $this->getReponse()->setStatusCode('404');
+            return;
+        }
+
+        //Get user info
+        $user = $this->entityManager->getRepository(Users::class)->find($idUser);
+        if (!$user){
+            $this->getReponse()->setStatusCode('404');
+            return;
+        }
+
+        $form = new ChangePasswordForm();
+        if($this->getRequest()->isPost()){
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()){
+                $data = $form->getData();
+                $check = $this->userManager->changePassword($user, $data);
+
+                if (!$check){
+                    $this->flashMessenger()->addErrorMessage('Old Pass is wrong, please check again');
+                    return $this->redirect()->toRoute('user',['action'=>'change-password','id'=>$user->getId()]);
+                }
+                else{
+                    $this->flashMessenger()->addSuccessMessage('Password Changed');
+                    return $this->redirect()->toRoute('user');
+                }
+            }
+        }
+        return new ViewModel(['form'=>$form]);
+    }
+
+    public function resetPasswordAction(){
+        $form = new ResetPasswordForm();
+
+        if ($this->getRequest()->isPost()){
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+
+            if ($form->isValid()){
+                
+            }
+        }
+
+        return new ViewModel(['form'=>$form]);
+    }
+
     public function reportAction(){
         $form = new UsersUsageForm('add');
         date_default_timezone_set("Asia/Ho_Chi_Minh");
-        echo date("Y-m-d");
+        // echo date("Y-m-d");
         if ($this->getRequest()->isPost()){
             $data = $this->params()->fromPost();
             $form->setData($data);
