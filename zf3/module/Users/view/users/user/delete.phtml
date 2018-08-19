@@ -1,0 +1,14 @@
+<?php $this->headTitle('Delete User'); ?>
+
+<h2>Delete User</h2>
+<div class="text-center" style="color:red; font-size: 20px; font-weight: bold;">
+    UserName: <?= $user->getUSERNAME() ?>
+    <br> Email: <?= $user->getEmail() ?> ?
+</div>
+
+<div class="text-center">
+    <form action="<?= $this->url('user',['action'=>'delete','id'=>$user->getId()]) ?>" method="POST">
+        <button type="submit" name="delete" value="No" class="btn btn-danger"><span class="glyphicon glyphicon-remove"></span> No</button>
+        <button type="submit" name="delete" value="Yes" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Yes</button>
+    </form>
+</div>

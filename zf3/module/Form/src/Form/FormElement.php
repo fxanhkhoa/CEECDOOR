@@ -76,7 +76,7 @@ class FormElement extends Form
                 'class' => 'control-label',
             ])
             ->setAttributes([
-                //'class' => 'form-control',
+                'class' => 'form-control',
                 //'multiple' => true,
                 'id' => 'select',
                 'placeholder' => 'Select One ...',
