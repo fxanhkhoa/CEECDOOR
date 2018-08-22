@@ -4,6 +4,11 @@ namespace Users\Service;
 use Users\Entity\Users;
 use Users\Entity\UsersUsage;
 use Zend\Crypt\Password\Bcrypt;
+use Zend\Math\Rand;
+use Zend\Mail\Message;
+use Zend\Mail\Transport\Smtp as SmtpTransport;
+use Zend\Mail\Transport\SmtpOptions;
+
 
 class UserManager
 {
@@ -133,6 +138,91 @@ class UserManager
 
         $this->entityManager->flush();
         return true;
+    }
+
+    public function createTokenPasswordReset($user){
+        $token = Rand::getString(32, '0123456789qwertyuiopasdfghjklzxcvbnm', true);
+        $user->setPasswordResetToken($token);
+
+        $dateCreate = date('Y-m-d H:i:s');
+        $dateCreate = new \DateTime($dateCreate);
+        $dateCreate->format('Y-m-d H:i:s');
+        $user->setPasswordResetTokenDate($dateCreate);
+        $this->entityManager->flush();
+
+        $http = isset($_SERVER['HTTPS']) ? "https://" : "http://";
+        $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : "localhost";
+        // echo $host;
+        $url = $http.$host."/CEECDOOR/zf3/public/set-password/".$token;
+
+        $bodyMessage = "Hello ". $user->getFullname(). "
+                        Please click this link below to reset password: 
+                        $url 
+                        if you don't need to, please discard this message
+                        ";
+
+        $message = new Message();
+        $message->addTo($user->getEMAIL());
+        $message->addFrom('sgu.ddt1141@gmail.com');
+        $message->setSubject('ResetPassword!');
+        $message->setBody($bodyMessage);
+
+        // Setup SMTP transport using LOGIN authentication
+        $transport = new SmtpTransport();
+        $options   = new SmtpOptions([
+            'name'              => 'smtp.gmail.com',
+            'host'              => 'smtp.gmail.com',
+            'port'              => 587,
+            'connection_class'  => 'login',
+            'connection_config' => [
+                'username' => 'sgu.ddt1141@gmail.com',
+                'password' => 'ddt1141.sgu',
+                'port'     => 587,
+                'ssl'      => 'tls',
+            ],
+        ]);
+        $transport->setOptions($options);
+        $transport->send($message);
+    }
+
+    public function checkResetPasswordToken($token){
+        $user = $this->entityManager->getRepository(Users::class)
+            ->findOneBy(['pw_reset_token'=>$token]);
+        if (!$user){
+            return false;
+        }
+
+        $userTokenDate = $user->getPasswordResetTokenDate()->getTimestamp();
+        $now = new \Datetime('now');
+        $now = $now->getTimestamp();
+        if ($now - $userTokenDate > 3600){
+            return false;
+        }
+        return true;
+    }
+
+    public function setNewPasswordByToken($token, $newPassword){
+       if (!$this->checkResetPasswordToken($token)){
+           return false;
+       }
+       
+       $user = $this->entityManager->getRepository(Users::class)
+            ->findOneBy(['pw_reset_token'=>$token]);
+
+       if (!$user){
+           return false;
+       }
+       else{
+           $bcrypt = new Bcrypt();
+           $passwordHash = $bcrypt->create($newPassword);
+           $user->setPASSWORD($passwordHash);
+
+           //reset
+           $user->setPasswordResetTokenDate(null);
+           $user->setPasswordResetToken(null);
+           $this->entityManager->flush();
+           return true;
+       }
     }
 
     public function addUSERUSAGE($data)

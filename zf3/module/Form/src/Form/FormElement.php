@@ -122,7 +122,7 @@ class FormElement extends Form
         $Captcha->setCaptcha(new Captcha\Image())
             ->setLabel('Make sure you are human')
             ->getCaptcha()->setImgDir('public/img/captcha')
-            ->setFont('public/fonts/arial.ttf')
+            ->setFont(getcwd().'/public/fonts/arial.ttf')
             ->setImgUrl('img/captcha')
             ->setSuffix('.png')
             ->setExpiration(60)

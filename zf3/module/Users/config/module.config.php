@@ -12,6 +12,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\Router\Http\Regex;
 use Doctrine\DBAL\Driver\PDOMySql\Driver as PDOMySqlDriver;
+use Zend\Authentication\AuthenticationService;
 
 return [
     'router' => [
@@ -26,11 +27,35 @@ return [
                     ],
                 ],
             ],
+            'setpassword' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/set-password[/:token]',
+                    'defaults' => [
+                        'controller' => Controller\UserController::class,
+                        'action'     => 'setPassword',
+                    ],
+                ],
+                'constraints'=>[
+                    'action' => '[a-zA-Z0-9_-]*',
+                ]
+            ],
+            'resetpassword' => [
+                'type' => Segment::class,
+                'options' => [
+                    'route'    => '/reset-password[/:token]',
+                    'defaults' => [
+                        'controller' => Controller\UserController::class,
+                        'action'     => 'resetPassword',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
         'factories' => [
             Controller\UserController::class => Controller\Factory\UserControllerFactory::class,
+            Controller\AuthController::class => Controller\Factory\AuthControllerFactory::class,
         ],
     ],
     'view_manager' => [
@@ -62,6 +87,9 @@ return [
     'service_manager'=>[
         'factories' => [
             Service\UserManager::class => Service\Factory\UserManagerFactory::class,
+            Service\AuthManager::class => Service\Factory\AuthManagerFactory::class,
+            Service\AuthAdapter::class => Service\Factory\AuthAdapterFactory::class,
+            AuthenticationService::class=>Service\Factory\AuthenticationService::class,
         ],
     ]
 ];

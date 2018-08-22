@@ -53,12 +53,13 @@ class ResetPasswordForm extends Form{
             ]
         ]);
 
+        
         //Captcha image
         $Captcha = new Element\Captcha('CAPTCHA');
         $Captcha->setCaptcha(new Captcha\Image())
             ->setLabel('Make sure you are human')
             ->getCaptcha()->setImgDir('public/img/captcha')
-            ->setFont('public/fonts/arial.ttf')
+            ->setFont(getcwd().'/public/fonts/arial.ttf')
             ->setImgUrl('../img/captcha')
             ->setSuffix('.png')
             ->setExpiration(300)
@@ -69,7 +70,6 @@ class ResetPasswordForm extends Form{
             ->setDotNoiseLevel(40)
             ->setLineNoiseLevel(3)
             ->setWordlen(4);
-
         $this->add($Captcha);
 
         //button

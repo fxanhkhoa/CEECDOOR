@@ -9,7 +9,9 @@ use Zend\Validator\EmailAddress;
 use Zend\Validator\Identical;
 
 class ChangePasswordForm extends Form{
-    public function __construct(){
+    private $action;
+    public function __construct($action = 'changePw'){
+        $this->action = $action;
         parent::__construct();
 
         $this->setAttributes([
@@ -23,21 +25,24 @@ class ChangePasswordForm extends Form{
 
     private function addElements(){
         //old password
-        $this->add([
-            'type'=>'password',
-            'name'=>'old_pw',
-            'options'=>[
-                'label'=>'Old Password',
-                'label_attributes'=>[
-                    'for'=>'old_pw',
-                    'class'=>'control-label'
+        if ($this->action == 'changePw'){
+            $this->add([
+                'type'=>'password',
+                'name'=>'old_pw',
+                'options'=>[
+                    'label'=>'Old Password',
+                    'label_attributes'=>[
+                        'for'=>'old_pw',
+                        'class'=>'control-label'
+                    ]
+                ],
+                'attributes'=>[
+                    'class'=>'form-control',
+                    'placeholder'=>'Input Old Password',
                 ]
-            ],
-            'attributes'=>[
-                'class'=>'form-control',
-                'placeholder'=>'Input Old Password',
-            ]
-        ]);
+            ]);
+        }
+        
 
         //new password
         $this->add([
@@ -102,33 +107,35 @@ class ChangePasswordForm extends Form{
         $this->setInputFilter($inputFilter);
 
         //old_pw
-        $inputFilter->add([
-            'name'=>'old_pw',
-            'required'=>true,
-            'filters'=>[
-                ['name'=>'StringTrim'],
-                ['name'=>'StripTags'],
-                ['name'=>'StripNewlines'],
-            ],
-            'validators'=>[
-                [
-                    'name'=>'NotEmpty',
-                    'options'=>[
-                        'break_chain_on_failure'=>true,
-                        'messages'=>[
-                            NotEmpty::IS_EMPTY=>'Password can not be empty'
+        if ($this->action == 'changePw'){
+            $inputFilter->add([
+                'name'=>'old_pw',
+                'required'=>true,
+                'filters'=>[
+                    ['name'=>'StringTrim'],
+                    ['name'=>'StripTags'],
+                    ['name'=>'StripNewlines'],
+                ],
+                'validators'=>[
+                    [
+                        'name'=>'NotEmpty',
+                        'options'=>[
+                            'break_chain_on_failure'=>true,
+                            'messages'=>[
+                                NotEmpty::IS_EMPTY=>'Password can not be empty'
+                            ]
+                        ]
+                    ],
+                    [
+                        'name'=>'StringLength',
+                        'options'=>[
+                            'min'=>8,
+                            'max'=>20
                         ]
                     ]
-                ],
-                [
-                    'name'=>'StringLength',
-                    'options'=>[
-                        'min'=>8,
-                        'max'=>20
-                    ]
                 ]
-            ]
-        ]);
+            ]);
+        }
 
         //new_pw
         $inputFilter->add([

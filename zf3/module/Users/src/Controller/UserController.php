@@ -170,17 +170,56 @@ class UserController extends AbstractActionController{
 
     public function resetPasswordAction(){
         $form = new ResetPasswordForm();
+        // echo $_SERVER['HTTP_HOST'];
 
         if ($this->getRequest()->isPost()){
             $data = $this->params()->fromPost();
             $form->setData($data);
 
             if ($form->isValid()){
-                
+                // print_r($data);
+                $user = $this->entityManager->getRepository(Users::class)->findOneBy(['EMAIL' => $data['email']]);
+                if ($user !== null){
+                    $this->userManager->createTokenPasswordReset($user);
+                    $this->flashMessenger()->addSuccessMessage('Check Email for reset password');
+                }
+                else{
+                    $this->flashMessenger()->addErrorMessage('Email does not exist');
+                }
+                return $this->redirect()->toRoute('user',['action'=>'reset-password']);
             }
         }
 
         return new ViewModel(['form'=>$form]);
+    }
+
+    public function setPasswordAction(){
+        $token = $this->params()->fromRoute('token', null);
+        if ($token == null || strlen($token) !=32){
+            throw new \Exception("Invalid Token");
+        }
+        else if (!$this->userManager->checkResetPasswordToken($token)){
+            throw new \Exception("Invalid Token or Timeout. Please try again");
+        }
+
+        $form = new ChangePasswordForm('resetPw');
+
+        if ($this->getRequest()->isPost()){
+            $data = $this->params()->fromPost();
+            $form->setData($data);
+            if ($form->isValid()){
+                if($this->userManager->setNewPasswordByToken($token, $data['new_pw'])){
+                    $this->flashMessenger()->addSuccessMessage('Reset successful');
+                }
+                else{
+                    $this->flashMessenger()->addErrorMessage('Reset fail');
+                }
+                return $this->redirect()->toRoute('reset-password');
+            }
+        }
+        
+        $view = new ViewModel(['form'=>$form]);
+        return $view;
     }
 
     public function reportAction(){
