@@ -8,30 +8,6 @@
       <div class="col-lg-4 col-sm-6 wow fadeInLeft delay-05s">
         <table class="table fixed_header table-striped table-hover">
         <!-- <table id="dtVerticalScrollExample" class="table table-striped table-bordered table-sm" cellspacing="0" width="100%"> -->
-        <?php
-
-
-        use Zend\Mvc\Controller\AbstractActionController;
-        use Zend\View\Model\ViewModel;
-        use Zend\DB\Adapter\Adapter;
-
-            $adapter = new \Zend\Db\Adapter\Adapter(array(
-                'driver' => 'Pdo_Mysql',
-                'database' => 'framework',
-                'username' => 'fxanhkhoa',
-                'password' => '03021996',
-                'hostname' => 'localhost',
-                'charset' => 'utf8'
-            ));
-
-            $sql = "select * from USERUSAGE";
-
-            $statement = $adapter->query($sql);
-
-            $result = $statement->execute();
-            $platform = $adapter->platform;
-        ?>
-
         <thead>
           <tr>
             <th class="th-sm">MSSV
@@ -53,7 +29,7 @@
         </thead>
         <tbody>
         <?php
-            foreach ($result as $row)
+            foreach ($users as $row)
               {
                 echo $this->partial('application/index/table-row', ['row'=>$row]);
               }
