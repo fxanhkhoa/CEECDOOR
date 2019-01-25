@@ -1,0 +1,3 @@
+$username="battleship";
+	    $password="qwerty12345678";
+	    $server = "localhost$dbname = "BATTLESHIP";
