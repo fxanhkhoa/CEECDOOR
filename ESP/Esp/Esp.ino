@@ -120,8 +120,9 @@ void WriteNoneSql();
 /*
  * Send "SSID." to receive ssid
  * Send "PASS." to receive password
- * Send "OK." or "ERROR."
  */
+ char id[50]="UIT Public";
+ char pass[50]="";
 void ConnectWifi();
 /*
  * Send "OK." or "ERROR."
@@ -136,9 +137,15 @@ void GetSqlStatus();
  */
 void GetDoorStatus();
 
+uint32_t count=0;
+void SetupWifi();
+
 void setup() {
-  Serial.begin(115200);
   pinMode(AVAILABLE_PIN,OUTPUT);
+  digitalWrite(AVAILABLE_PIN,LOW); //busy
+  Serial.begin(115200);
+  SetupWifi();
+  count=0;
 }
 
 void loop() {
@@ -190,7 +197,16 @@ void loop() {
     GetDoorStatus();
     bitClear(Flag,GET_DOOR_STATUS_BIT);
   }
-  digitalWrite(AVAILABLE_PIN,HIGH); //available
+  if(WiFi.status() != WL_CONNECTED) {
+    digitalWrite(AVAILABLE_PIN,LOW); //busy
+    SetupWifi();
+  }
+  if (count >=1000) {
+    count=0;
+    digitalWrite(AVAILABLE_PIN,HIGH); //available
+  } else {
+    count++;
+  }
 }
 
 void ProcessCmd(void) {
@@ -361,16 +377,17 @@ void WriteNoneSql() {
 void ConnectWifi (void) {
   Serial.print("SSID.");
   ReceiveString(50,'.');
-  char id[50]={};
-  for(int i=0; i<InString.length(); i++) {
+  int i=0;
+  for(i=0; i<InString.length(); i++) {
     id[i]=(char)InString[i];
   }
+  id[i]=0x00;
   Serial.print("PASS.");
   ReceiveString(50,'.');
-  char pass[50]={};
-  for(int i=0; i<InString.length(); i++) {
+  for(i=0; i<InString.length(); i++) {
     pass[i]=(char)InString[i];
   }
+  id[i]=0x00;
   WiFi.begin(id, pass);
 }
 
@@ -389,6 +406,17 @@ void GetSqlStatus(void) {
 
 void GetDoorStatus(void) {
   Serial.print(door_status);
+}
+
+void SetupWifi() {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(id, pass);
+  count=0;
+  while ((WiFi.status() != WL_CONNECTED) & (count<20))
+  {
+    count++;
+    delay(500);
+  }
 }
 
 
